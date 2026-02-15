@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Add an in-game Store accessible from the menu, selling neon light items purchasable with XP earned during races via collectible XP coins.",
+  "architectural_notes": [
+    "Store currency is XP earned during races via collectible XP coins.",
+    "Store is accessed from the main menu via a dedicated Store button.",
+    "Purchased neon lights are permanently unlocked (persisted per player)."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Neon light icon thumbnail set: red, blue, yellow, purple, orange, white, multicolor (neon-light-red.dim_256x256.png; neon-light-blue.dim_256x256.png; neon-light-yellow.dim_256x256.png; neon-light-purple.dim_256x256.png; neon-light-orange.dim_256x256.png; neon-light-white.dim_256x256.png; neon-light-multicolor.dim_256x256.png)\n- XP coin sprites for values 1, 5, 10, 20 with clear numeric marking (xp-coin-1.dim_128x128.png; xp-coin-5.dim_128x128.png; xp-coin-10.dim_128x128.png; xp-coin-20.dim_128x128.png)",
+  "existing_features": [
+    {
+      "id": "feature-add-a-new-store-page-reachable-at-a-dedicated-route-e-g-store-and-make-it-accessible-via-a-clearly-labeled-button-on-the-main-menu-menu-tab-that-navigates-to-the-store-page",
+      "title": "Add a new Store page reachable at a dedicated route (e.g., \"/store\") and make it accessible via a clearly labeled button on the Main Menu \"Menu\" tab that navigates to the Store page.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-store-catalog-ui-listing-neon-light-items-purchasable-with-xp-with-the-following-items-and-xp-costs-red-100-blue-100-yellow-100-purple-100-orange-100-multicolor-1000-and-white-25-show-the-user-s-current-xp-balance-on-the-store-page",
+      "title": "Implement the Store catalog UI listing neon light items purchasable with XP, with the following items and XP costs: red=100, blue=100, yellow=100, purple=100, orange=100, multicolor=1000, and white=25. Show the user’s current XP balance on the Store page.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-collectible-xp-coins-to-the-race-track-gameplay-such-that-1-xp-and-5-xp-coins-appear-commonly-on-the-track-while-10-xp-and-20-xp-coins-appear-in-hidden-places-and-or-become-obtainable-after-the-player-performs-an-amazing-stunt-during-a-race-collecting-a-coin-must-automatically-add-its-xp-value-to-the-player-s-total-xp-used-in-the-store",
+      "title": "Add collectible XP coins to the race track gameplay such that 1 XP and 5 XP coins appear commonly on the track, while 10 XP and 20 XP coins appear in hidden places and/or become obtainable after the player performs an \"amazing stunt\" during a race. Collecting a coin must automatically add its XP value to the player’s total XP (used in the Store).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-define-and-implement-an-in-race-amazing-stunt-detection-heuristic-using-only-in-game-telemetry-available-in-the-current-race-implementation-that-when-triggered-enables-access-to-higher-value-coins-10-20-as-described-by-the-user",
+      "title": "Define and implement an in-race \"amazing stunt\" detection heuristic (using only in-game telemetry available in the current race implementation) that, when triggered, enables access to higher-value coins (10/20) as described by the user.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-cohesive-neon-racing-visual-theme-for-the-store-experience-and-any-new-xp-coin-ui-elements-using-a-distinct-palette-and-typography-that-fits-neon-lights-apply-it-consistently-across-new-store-components-and-coin-related-hud-elements-without-changing-existing-read-only-ui-component-sources",
+      "title": "Create a cohesive neon-racing visual theme for the Store experience (and any new XP/coin UI elements), using a distinct palette and typography that fits neon lights. Apply it consistently across new Store components and coin-related HUD elements without changing existing read-only UI component sources.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-frontend-query-mutation-wiring-react-query-to-load-xp-owned-neon-lights-and-to-purchase-items-ensuring-ui-updates-immediately-after-successful-purchase-and-after-xp-is-earned-from-coin-pickups",
+      "title": "Add frontend query/mutation wiring (React Query) to load XP + owned neon lights and to purchase items, ensuring UI updates immediately after successful purchase and after XP is earned from coin pickups.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-generated-static-image-assets-for-the-store-neon-light-thumbnails-and-xp-coin-visuals-and-render-them-in-the-store-page-and-in-race-ui-as-appropriate-store-images-must-be-placed-under-frontend-public-assets-generated-and-referenced-directly-by-the-frontend-not-served-through-the-backend",
+      "title": "Add generated static image assets for the Store neon light thumbnails and XP coin visuals, and render them in the Store page and in-race UI as appropriate. Store images must be placed under \"frontend/public/assets/generated\" and referenced directly by the frontend (not served through the backend).",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a Store page accessible via a button on the menu page",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add neon light items to the Store with XP pricing (red/blue/yellow/purple/orange/multicolor=100 XP; white=25 XP; multicolor=1000 XP)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement permanent unlock behavior for purchased neon lights (persist per player)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add collectible XP coins in races (1, 5 common; 10 and 20 hidden/after stunts) and use XP as store currency",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Add backend support for XP as a player currency and permanent unlocks for purchased neon lights, persisted per authenticated player. Expose backend methods for: fetching current XP + owned neon lights, purchasing a neon light (deduct XP and mark owned), and crediting XP earned from races/coin pickups.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Add XP coin pickups and a neon-light Store page accessible from Main Menu",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

@@ -1,0 +1,72 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-14T14:00:28.363Z",
+  "summary": "The diff adds a /store route and Store page UI with a neon theme, a store catalog with correct XP prices, and introduces stunt-detection and XP coin type definitions plus an in-race XP HUD. However, the actual XP coin spawning/collection gameplay loop, backend XP/unlock methods, and the required generated image assets under frontend/public/assets/generated are not evidenced in the provided diff summary. The diff also appears to include unrelated Stripe/subscription/payment flow work not requested (and contrary to the non-goal about real-money payments).",
+  "missing_requirements": [
+    {
+      "id": "REQ-3",
+      "requirement": "Backend support for XP currency and permanent unlocks per Internet Identity principal, with methods to fetch XP+owned items, purchase items (deduct XP), and credit XP earned.",
+      "reason": "backend/main.mo shows new store-related types, but the diff excerpt is truncated before any concrete public methods (get status / purchase / credit XP) or persistence logic can be verified from the provided evidence.",
+      "evidence": [
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Add collectible XP coins to race gameplay (1/5 common; 10/20 hidden or stunt-gated). Collecting a coin should credit XP and prevent re-collection of the same coin instance.",
+      "reason": "The diff adds coin type definitions and an XP HUD, but does not show any race/track code changes that place/spawn coins, detect collection, remove/mark coins collected, or call the backend to credit XP.",
+      "evidence": [
+        "frontend/src/components/race/XPCoinTypes.ts",
+        "frontend/src/components/race/RaceXPHUD.tsx",
+        "frontend-file-summaries.txt (mentions RaceGame/SinglePlayerRace/F1RaceTrack changes but no coin spawning/collection shown)"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Implement an explicit amazing-stunt trigger with cooldown that enables at least one 10/20 XP coin to become obtainable during that race.",
+      "reason": "A stunt detection utility with airtime/height/speed and a 5s cooldown is added, but no evidence shows it being integrated into race logic to spawn/reveal higher-value (10/20) coins when a stunt triggers.",
+      "evidence": [
+        "frontend/src/components/race/stuntDetection.ts"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "requirement": "Add the required generated neon-light thumbnails and XP coin images under frontend/public/assets/generated and reference them via /assets/generated/...",
+      "reason": "Store/coin code references the expected /assets/generated/*.png paths, but no new static image files under frontend/public/assets/generated are included in the diff summary.",
+      "evidence": [
+        "frontend/src/components/store/storeCatalog.ts",
+        "frontend/src/components/race/XPCoinTypes.ts"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Stripe/subscription plan and payment success/failure flow integration (real-money payments related functionality).",
+      "reason": "The BuildRequest explicitly lists real-money payments as a non-goal, but the diff shows Stripe-related plan UI and payment routes, and backend imports for Stripe/outcalls.",
+      "evidence": [
+        "frontend/src/pages/Plans.tsx (modified, truncated)",
+        "frontend/src/App.tsx (adds payment-success/payment-failure routes)",
+        "backend/main.mo (imports Stripe \"stripe/stripe\" and http-outcalls)"
+      ]
+    }
+  ],
+  "confidence": 0.66,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Matchmaking.tsx",
+    "frontend/src/components/race/RaceXPHUD.tsx",
+    "frontend/src/components/race/XPCoinTypes.ts",
+    "frontend/src/components/race/stuntDetection.ts",
+    "frontend/src/components/store/StoreItemCard.tsx",
+    "frontend/src/components/store/storeCatalog.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/MainMenu.tsx",
+    "frontend/src/pages/Plans.tsx",
+    "frontend/src/pages/Store.tsx",
+    "project_state.json"
+  ]
+}

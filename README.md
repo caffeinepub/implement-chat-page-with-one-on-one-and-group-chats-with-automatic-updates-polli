@@ -1,2 +1,3 @@
-# implement-chat-page-with-one-on-one-and-group-chats-with-automatic-updates-polli
-Exported from Caffeine project: Add XP coin pickups and a neon-light Store page accessible from Main Menu
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

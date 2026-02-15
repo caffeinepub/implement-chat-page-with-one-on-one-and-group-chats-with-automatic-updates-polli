@@ -1,0 +1,167 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-14T14:00:28.367Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 8,
+    "implemented": 7,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Add a new Store page reachable at a dedicated route (e.g., \"/store\") and make it accessible via a clearly labeled button on the Main Menu \"Menu\" tab that navigates to the Store page.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/MainMenu.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/MainMenu.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Implement the Store catalog UI listing neon light items purchasable with XP, with the following items and XP costs: red=100, blue=100, yellow=100, purple=100, orange=100, multicolor=1000, and white=25. Show the user’s current XP balance on the Store page.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/components/store/StoreItemCard.tsx",
+          "frontend/src/components/store/storeCatalog.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/components/store/StoreItemCard.tsx",
+          "frontend/src/components/store/storeCatalog.ts"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Add backend support for XP as a player currency and permanent unlocks for purchased neon lights, persisted per authenticated player. Expose backend methods for: fetching current XP + owned neon lights, purchasing a neon light (deduct XP and mark owned), and crediting XP earned from races/coin pickups.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Add collectible XP coins to the race track gameplay such that 1 XP and 5 XP coins appear commonly on the track, while 10 XP and 20 XP coins appear in hidden places and/or become obtainable after the player performs an \"amazing stunt\" during a race. Collecting a coin must automatically add its XP value to the player’s total XP (used in the Store).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx",
+          "frontend/src/components/race/XPCoinTypes.ts",
+          "frontend/src/components/race/RaceXPHUD.tsx",
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/race/XPCoinTypes.ts",
+          "frontend/src/components/race/RaceXPHUD.tsx"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Define and implement an in-race \"amazing stunt\" detection heuristic (using only in-game telemetry available in the current race implementation) that, when triggered, enables access to higher-value coins (10/20) as described by the user.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx",
+          "frontend/src/components/race/stuntDetection.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/race/stuntDetection.ts"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Create a cohesive neon-racing visual theme for the Store experience (and any new XP/coin UI elements), using a distinct palette and typography that fits neon lights. Apply it consistently across new Store components and coin-related HUD elements without changing existing read-only UI component sources.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/components/race/RaceXPHUD.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/components/race/RaceXPHUD.tsx"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Add frontend query/mutation wiring (React Query) to load XP + owned neon lights and to purchase items, ensuring UI updates immediately after successful purchase and after XP is earned from coin pickups.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Store.tsx"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Add generated static image assets for the Store neon light thumbnails and XP coin visuals, and render them in the Store page and in-race UI as appropriate. Store images must be placed under \"frontend/public/assets/generated\" and referenced directly by the frontend (not served through the backend).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/public/assets/generated/neon-light-red.dim_256x256.png",
+          "frontend/public/assets/generated/neon-light-blue.dim_256x256.png",
+          "frontend/public/assets/generated/neon-light-yellow.dim_256x256.png",
+          "frontend/public/assets/generated/neon-light-purple.dim_256x256.png",
+          "frontend/public/assets/generated/neon-light-orange.dim_256x256.png",
+          "frontend/public/assets/generated/neon-light-white.dim_256x256.png",
+          "frontend/public/assets/generated/neon-light-multicolor.dim_256x256.png",
+          "frontend/public/assets/generated/xp-coin-1.dim_128x128.png",
+          "frontend/public/assets/generated/xp-coin-5.dim_128x128.png",
+          "frontend/public/assets/generated/xp-coin-10.dim_128x128.png",
+          "frontend/public/assets/generated/xp-coin-20.dim_128x128.png",
+          "frontend/src/pages/Store.tsx",
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Store.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/public/assets/generated/neon-light-red.dim_256x256.png; neon-light-blue.dim_256x256.png; neon-light-yellow.dim_256x256.png; neon-light-purple.dim_256x256.png; neon-light-orange.dim_256x256.png; neon-light-white.dim_256x256.png; neon-light-multicolor.dim_256x256.png",
+    "frontend/public/assets/generated/xp-coin-1.dim_128x128.png; xp-coin-5.dim_128x128.png; xp-coin-10.dim_128x128.png; xp-coin-20.dim_128x128.png",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/Matchmaking.tsx",
+    "frontend/src/components/race/RaceXPHUD.tsx",
+    "frontend/src/components/race/XPCoinTypes.ts",
+    "frontend/src/components/race/stuntDetection.ts",
+    "frontend/src/components/store/StoreItemCard.tsx",
+    "frontend/src/components/store/storeCatalog.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/MainMenu.tsx",
+    "frontend/src/pages/Plans.tsx",
+    "frontend/src/pages/Store.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

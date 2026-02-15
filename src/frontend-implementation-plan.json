@@ -1,0 +1,271 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "XP coin pickups + neon Store page route and UI",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add a dedicated Store route and wire navigation from the Main Menu plus a clear return path.",
+      "acceptanceCriteria": [
+        "Main menu contains a visible \"Store\" button on the \"Menu\" tab.",
+        "Clicking the \"Store\" button navigates to the Store page without a full page reload.",
+        "There is an obvious way to return from the Store page back to the Main Menu."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Store.tsx",
+          "operation": "create",
+          "description": "Create the Store page view with a clearly labeled Back/Return control that navigates to the Main Menu using TanStack Router navigation. Use shadcn-ui components (e.g., Card, Button) for layout; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register a new TanStack Router route for \"/store\" and wire it into the existing routeTree so navigation occurs client-side without full page reload."
+        },
+        {
+          "path": "frontend/src/pages/MainMenu.tsx",
+          "operation": "modify",
+          "description": "Add a visible, clearly labeled \"Store\" button within the \"Menu\" tab content that navigates to \"/store\" via TanStack Router. Use shadcn-ui Button for consistency; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement the neon Store catalog UI with exact item prices, owned/buy states, and show the player XP balance.",
+      "acceptanceCriteria": [
+        "Store page shows all 7 neon light items with the exact XP prices specified by the user.",
+        "Store page displays the player’s current XP balance (numeric) in a prominent location.",
+        "Each item shows one of these states based on backend data: \"Buy\" (locked), \"Owned\" (unlocked).",
+        "If the user has insufficient XP, the UI prevents purchase and shows an English error message (e.g., \"Not enough XP\")."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Store.tsx",
+          "operation": "modify",
+          "description": "Implement the Store catalog grid listing the exact neon items and costs (red=100, blue=100, yellow=100, purple=100, orange=100, multicolor=1000, white=25). Display the current XP balance prominently and render each item state as \"Owned\" vs \"Buy\" based on fetched ownership data. Use shadcn-ui Card/Badge/Button for item tiles and state display; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/store/StoreItemCard.tsx",
+          "operation": "create",
+          "description": "Add a reusable Store item card component that renders thumbnail, item name, XP cost, and stateful action (Buy/Owned/Disabled). Use shadcn-ui primitives for consistent UI; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/store/storeCatalog.ts",
+          "operation": "create",
+          "description": "Define the Store catalog source-of-truth constants for the 7 neon items (names, costs, thumbnail image mapping) to guarantee the exact prices required by the user."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Add collectible XP coins to the in-race 3D gameplay with rarity rules and one-time collection that credits XP automatically.",
+      "acceptanceCriteria": [
+        "During a race, the player can collect XP coins and see their XP increase without needing to manually refresh.",
+        "1 XP and 5 XP coins appear in normal/on-track locations with noticeably higher frequency than 10/20 coins.",
+        "10 XP and 20 XP coins are not commonly visible on the main racing line; they are placed in hidden/off-line locations and/or appear after the stunt condition is met.",
+        "Coin collection cannot be repeated for the same coin instance (i.e., a collected coin is removed/marked collected)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Integrate XP coin spawning, rendering (3D sprites/planes), and collision-based collection into the existing 3D race loop. Ensure many 1/5 XP coins spawn in normal track areas, and 10/20 XP coins are placed off-line/hidden and/or gated by the stunt trigger. On collect: mark the coin instance as collected (removed/hidden) to prevent repeat collection, and invoke the backend coin-collection capability via React Query wiring so XP is credited immediately."
+        },
+        {
+          "path": "frontend/src/components/AIRaceTrack.tsx",
+          "operation": "modify",
+          "description": "Add the same XP coin spawning/rendering/collection behavior to AI race gameplay so coin pickup rules are consistent across race modes. Ensure collection removes/marks the coin instance and credits XP via the existing backend coin-collection capability through React Query wiring."
+        },
+        {
+          "path": "frontend/src/components/race/XPCoinTypes.ts",
+          "operation": "create",
+          "description": "Create shared frontend types/helpers for XP coin values (1/5/10/20), their sprite image mapping, and any shared coin metadata needed by both race components."
+        },
+        {
+          "path": "frontend/src/components/race/RaceXPHUD.tsx",
+          "operation": "create",
+          "description": "Create a small in-race HUD element showing recent XP gains and/or current run XP pickups (neon-styled). Use shadcn-ui where appropriate (e.g., Badge) without editing immutable UI sources; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Wire the new RaceXPHUD component into the F1 race UI overlay so players receive immediate visual feedback when collecting XP coins (without manual refresh)."
+        },
+        {
+          "path": "frontend/src/components/AIRaceTrack.tsx",
+          "operation": "modify",
+          "description": "Wire the new RaceXPHUD component into the AI race UI overlay for immediate XP pickup feedback (without manual refresh)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Implement an \"amazing stunt\" detection heuristic that gates high-value (10/20) coins with sensible cooldown.",
+      "acceptanceCriteria": [
+        "There is an explicit, documented stunt trigger condition implemented in the race code (e.g., airtime + landing, speed + jump, sharp drift + speed, etc.) that can be reliably achieved in gameplay.",
+        "When the stunt triggers, at least one 10 XP or 20 XP coin becomes obtainable (e.g., spawned or revealed) during that race.",
+        "The stunt trigger does not fire continuously every frame; it has sensible gating/cooldown so it feels like an achievement."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Add an explicit stunt heuristic using existing race telemetry available in this component (e.g., detect airtime above a Y-threshold for a minimum duration combined with sufficient speed, then confirm landing) and gate it with a cooldown. When triggered, reveal/spawn at least one 10 XP or 20 XP coin during the current race."
+        },
+        {
+          "path": "frontend/src/components/AIRaceTrack.tsx",
+          "operation": "modify",
+          "description": "Implement the same stunt trigger heuristic and cooldown logic for AI races, and reveal/spawn at least one 10/20 XP coin when the stunt condition triggers."
+        },
+        {
+          "path": "frontend/src/components/race/stuntDetection.ts",
+          "operation": "create",
+          "description": "Create a shared stunt detection helper (documented in code comments) that consumes available telemetry (position/velocity/airtime/landing) and emits a gated \"stunt triggered\" signal usable by both race implementations."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Apply a cohesive neon-racing theme to the Store and new XP/coin HUD UI without editing immutable UI component sources.",
+      "acceptanceCriteria": [
+        "Store page has a consistent neon-inspired look (colors, spacing, typography, card styling) that is clearly differentiated from default styling.",
+        "New theme is applied consistently across Store list, XP balance display, and purchase states.",
+        "No edits are made to files under \"frontend/src/components/ui\" or any other immutable paths."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add neon-racing theme utility classes and/or CSS variables (scoped to Store and new race HUD elements) to create a consistent neon palette, glow accents, and typography treatment while leaving immutable UI component sources untouched."
+        },
+        {
+          "path": "frontend/src/pages/Store.tsx",
+          "operation": "modify",
+          "description": "Apply the neon theme classes consistently across the Store page (header, XP balance, item cards, Buy/Owned states) without modifying any files under frontend/src/components/ui. Use shadcn-ui composition for structure; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/race/RaceXPHUD.tsx",
+          "operation": "modify",
+          "description": "Apply the same neon theme styling conventions to the XP coin HUD (colors, glow accents, spacing) for consistent visual language with the Store. Use shadcn-ui composition where helpful; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Wire React Query queries/mutations for Store data and purchases, and ensure coin pickups trigger correct refetch/update behavior.",
+      "acceptanceCriteria": [
+        "Store page uses React Query to fetch the current XP and owned neon lights.",
+        "After purchasing an item, the Store UI updates to show the new XP total and the item as owned without requiring a hard refresh.",
+        "After collecting XP coins in a race, the player’s XP displayed in the Store is correct after navigating to the Store (and/or after a refetch)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks for Store: fetch XP + owned items (using existing backend capabilities like getStoreStatus/getFullStoreData/getMyOwnedItems as appropriate) and purchase mutation (purchaseItem). Ensure mutations invalidate/refetch Store queries on success and surface errors in English via toast."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a React Query mutation hook for XP coin collection (using the existing backend coin-collection capability) that returns the updated XP and invalidates Store-related query keys so the Store balance is correct after pickups."
+        },
+        {
+          "path": "frontend/src/pages/Store.tsx",
+          "operation": "modify",
+          "description": "Use the new React Query Store hooks to render XP balance, ownership state, and handle purchases. Ensure insufficient XP prevents purchase in the UI and shows an English error message (e.g., \"Not enough XP\"). Use shadcn-ui for feedback and layout; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Call the React Query coin-collection mutation when a coin is collected and update local HUD immediately; ensure Store-related query keys are invalidated/refetched so Store XP is correct after returning to the Store."
+        },
+        {
+          "path": "frontend/src/components/AIRaceTrack.tsx",
+          "operation": "modify",
+          "description": "Call the React Query coin-collection mutation on coin pickup and update HUD immediately; ensure Store-related query keys are invalidated/refetched so Store XP is correct after returning to the Store."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Add and render generated Store neon thumbnails and XP coin visuals from static assets under frontend/public/assets/generated.",
+      "acceptanceCriteria": [
+        "All required images exist under \"frontend/public/assets/generated\" and are referenced via \"/assets/generated/...\" paths.",
+        "Store items display a thumbnail image for each neon light color.",
+        "XP coin pickups use coin images (or in-world sprites) that visually differentiate 1/5/10/20 values."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/neon-light-red.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-red.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/neon-light-blue.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-blue.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/neon-light-yellow.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-yellow.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/neon-light-purple.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-purple.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/neon-light-orange.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-orange.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/neon-light-white.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-white.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/neon-light-multicolor.dim_256x256.png",
+          "operation": "create",
+          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-multicolor.dim_256x256.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/xp-coin-1.dim_128x128.png",
+          "operation": "create",
+          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-1.dim_128x128.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/xp-coin-5.dim_128x128.png",
+          "operation": "create",
+          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-5.dim_128x128.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/xp-coin-10.dim_128x128.png",
+          "operation": "create",
+          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-10.dim_128x128.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/xp-coin-20.dim_128x128.png",
+          "operation": "create",
+          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-20.dim_128x128.png."
+        },
+        {
+          "path": "frontend/src/pages/Store.tsx",
+          "operation": "modify",
+          "description": "Render the neon light thumbnails for each Store item by referencing the exact static asset paths under frontend/public/assets/generated. Use shadcn-ui Card/Image composition; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Render XP coin pickups using the coin sprite images (frontend/public/assets/generated/xp-coin-1.dim_128x128.png, xp-coin-5.dim_128x128.png, xp-coin-10.dim_128x128.png, xp-coin-20.dim_128x128.png) so values are visually differentiated."
+        },
+        {
+          "path": "frontend/src/components/AIRaceTrack.tsx",
+          "operation": "modify",
+          "description": "Render XP coin pickups using the coin sprite images (frontend/public/assets/generated/xp-coin-1.dim_128x128.png, xp-coin-5.dim_128x128.png, xp-coin-10.dim_128x128.png, xp-coin-20.dim_128x128.png) so values are visually differentiated."
+        }
+      ]
+    }
+  ]
+}
