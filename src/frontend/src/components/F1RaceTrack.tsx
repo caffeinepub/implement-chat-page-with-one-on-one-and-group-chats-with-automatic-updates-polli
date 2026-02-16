@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,16 @@ import { useEngineAudio } from '../hooks/useEngineAudio';
 import { Flag, Trophy, Clock, Users, Volume2, VolumeX, Cloud, CloudRain, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Position, CarState } from '../backend';
+import { RealisticSportsCoupeCar } from './race/RealisticSportsCoupeCar';
+import { RealisticRoadCourseScene } from './race/RealisticRoadCourseScene';
+import { useCarControls } from './race/useCarControls';
+import { useChaseCamera } from './race/useChaseCamera';
+import { RaceHUDOverlay } from './race/RaceHUDOverlay';
+
+interface F1RaceTrackProps {
+  trackId?: string;
+  matchedPlayers?: string[];
+}
 
 interface PlayerCar {
   principal: string;
@@ -25,115 +35,6 @@ interface PlayerCar {
 }
 
 type WeatherType = 'sunny' | 'overcast' | 'rainy';
-
-function F1Car({ 
-  position, 
-  rotation, 
-  isPlayer, 
-  carNumber, 
-  velocity,
-  suspensionOffset 
-}: { 
-  position: THREE.Vector3; 
-  rotation: number; 
-  isPlayer: boolean; 
-  carNumber: number;
-  velocity: number;
-  suspensionOffset: number;
-}) {
-  const meshRef = useRef<THREE.Group>(null);
-  const texture = useLoader(THREE.TextureLoader, isPlayer ? '/assets/generated/race-car-blue.dim_64x32.png' : '/assets/generated/race-car-red.dim_64x32.png');
-  const wheelRotation = useRef(0);
-
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.position.copy(position);
-      meshRef.current.position.y += suspensionOffset;
-      meshRef.current.rotation.y = rotation;
-      
-      wheelRotation.current += velocity * delta * 0.5;
-    }
-  });
-
-  return (
-    <group ref={meshRef}>
-      <mesh castShadow position={[0, 0.4, 0]}>
-        <boxGeometry args={[1.4, 0.5, 3.5]} />
-        <meshStandardMaterial map={texture} metalness={0.7} roughness={0.3} />
-      </mesh>
-
-      <mesh castShadow position={[0, 0.8, -0.3]}>
-        <boxGeometry args={[0.9, 0.4, 1.2]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
-      </mesh>
-
-      <mesh castShadow position={[0, 0.2, 1.9]}>
-        <boxGeometry args={[2.2, 0.1, 0.4]} />
-        <meshStandardMaterial color={isPlayer ? '#0066ff' : '#ff0000'} metalness={0.8} roughness={0.2} />
-      </mesh>
-      <mesh castShadow position={[0, 0.15, 2.1]}>
-        <boxGeometry args={[2.0, 0.05, 0.2]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
-      </mesh>
-
-      <mesh castShadow position={[0, 1.2, -1.8]}>
-        <boxGeometry args={[1.8, 0.8, 0.1]} />
-        <meshStandardMaterial color={isPlayer ? '#0066ff' : '#ff0000'} metalness={0.8} roughness={0.2} />
-      </mesh>
-      <mesh castShadow position={[-0.7, 0.8, -1.8]}>
-        <boxGeometry args={[0.1, 0.5, 0.1]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
-      </mesh>
-      <mesh castShadow position={[0.7, 0.8, -1.8]}>
-        <boxGeometry args={[0.1, 0.5, 0.1]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
-      </mesh>
-
-      <mesh castShadow position={[-0.8, 0.3, 1.2]} rotation={[wheelRotation.current, 0, 0]}>
-        <cylinderGeometry args={[0.35, 0.35, 0.3, 16]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.9} />
-      </mesh>
-      <mesh castShadow position={[0.8, 0.3, 1.2]} rotation={[wheelRotation.current, 0, 0]}>
-        <cylinderGeometry args={[0.35, 0.35, 0.3, 16]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.9} />
-      </mesh>
-      <mesh castShadow position={[-0.8, 0.35, -1.2]} rotation={[wheelRotation.current, 0, 0]}>
-        <cylinderGeometry args={[0.4, 0.4, 0.4, 16]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.9} />
-      </mesh>
-      <mesh castShadow position={[0.8, 0.35, -1.2]} rotation={[wheelRotation.current, 0, 0]}>
-        <cylinderGeometry args={[0.4, 0.4, 0.4, 16]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.9} />
-      </mesh>
-
-      <mesh castShadow position={[0, 0.7, -0.8]}>
-        <boxGeometry args={[1.0, 0.3, 1.0]} />
-        <meshStandardMaterial color={isPlayer ? '#003d99' : '#990000'} metalness={0.8} roughness={0.3} />
-      </mesh>
-
-      <mesh castShadow position={[-0.9, 0.5, 0.2]}>
-        <boxGeometry args={[0.3, 0.4, 2.0]} />
-        <meshStandardMaterial color={isPlayer ? '#0066ff' : '#ff0000'} metalness={0.7} roughness={0.3} />
-      </mesh>
-      <mesh castShadow position={[0.9, 0.5, 0.2]}>
-        <boxGeometry args={[0.3, 0.4, 2.0]} />
-        <meshStandardMaterial color={isPlayer ? '#0066ff' : '#ff0000'} metalness={0.7} roughness={0.3} />
-      </mesh>
-
-      {isPlayer && (
-        <mesh position={[0, 2.2, 0]}>
-          <coneGeometry args={[0.3, 0.8, 4]} />
-          <meshStandardMaterial color="#ffff00" emissive="#ffff00" emissiveIntensity={0.8} />
-        </mesh>
-      )}
-
-      <mesh position={[0, 0.95, -0.3]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[0.4, 0.3]} />
-        <meshStandardMaterial color="#ffffff" transparent opacity={0.9} />
-      </mesh>
-    </group>
-  );
-}
 
 function AnimatedCrowd({ position }: { position: [number, number, number] }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -185,173 +86,6 @@ function WavingFlags({ position }: { position: [number, number, number] }) {
   );
 }
 
-function PitCrew({ position }: { position: [number, number, number] }) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-
-  useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    loader.load('/assets/generated/pit-crew-activity.dim_800x600.png', (loadedTexture) => {
-      setTexture(loadedTexture);
-    });
-  }, []);
-
-  return (
-    <mesh position={position} castShadow>
-      <planeGeometry args={[6, 4]} />
-      <meshStandardMaterial map={texture} side={THREE.DoubleSide} />
-    </mesh>
-  );
-}
-
-function Track({ weather }: { weather: WeatherType }) {
-  const trackRef = useRef<THREE.Mesh>(null);
-  const [albedoTexture, setAlbedoTexture] = useState<THREE.Texture | null>(null);
-  const [normalTexture, setNormalTexture] = useState<THREE.Texture | null>(null);
-  const [roughnessTexture, setRoughnessTexture] = useState<THREE.Texture | null>(null);
-  const [curbTexture, setCurbTexture] = useState<THREE.Texture | null>(null);
-  const [markingsTexture, setMarkingsTexture] = useState<THREE.Texture | null>(null);
-  
-  useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    
-    loader.load('/assets/generated/track-asphalt.dim_256x256.png', (tex) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(20, 20);
-      setAlbedoTexture(tex);
-    });
-    
-    loader.load('/assets/generated/track-asphalt-normal.dim_1024x1024.png', (tex) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(20, 20);
-      setNormalTexture(tex);
-    });
-    
-    loader.load('/assets/generated/track-asphalt-roughness.dim_1024x1024.png', (tex) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(20, 20);
-      setRoughnessTexture(tex);
-    });
-    
-    loader.load('/assets/generated/track-curb-redwhite.dim_1024x256.png', (tex) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      setCurbTexture(tex);
-    });
-    
-    loader.load('/assets/generated/track-lines-markings.dim_1024x1024.png', (tex) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(10, 10);
-      setMarkingsTexture(tex);
-    });
-  }, []);
-
-  const trackRoughness = weather === 'rainy' ? 0.15 : 0.8;
-  const trackMetalness = weather === 'rainy' ? 0.3 : 0.0;
-  const envMapIntensity = weather === 'rainy' ? 1.5 : 0.5;
-
-  return (
-    <group>
-      <mesh ref={trackRef} receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <ringGeometry args={[40, 60, 64]} />
-        <meshStandardMaterial 
-          map={albedoTexture}
-          normalMap={normalTexture}
-          roughnessMap={roughnessTexture}
-          roughness={trackRoughness} 
-          metalness={trackMetalness}
-          envMapIntensity={envMapIntensity}
-        />
-      </mesh>
-
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
-        <ringGeometry args={[40, 60, 64]} />
-        <meshStandardMaterial 
-          map={markingsTexture}
-          transparent
-          opacity={0.6}
-          depthWrite={false}
-        />
-      </mesh>
-
-      {[...Array(32)].map((_, i) => {
-        const angle = (i / 32) * Math.PI * 2;
-        const radius = 39.5;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        return (
-          <mesh key={`curb-inner-${i}`} position={[x, 0.1, z]} rotation={[-Math.PI / 2, 0, angle]} receiveShadow>
-            <planeGeometry args={[0.8, 4]} />
-            <meshStandardMaterial map={curbTexture} />
-          </mesh>
-        );
-      })}
-
-      {[...Array(32)].map((_, i) => {
-        const angle = (i / 32) * Math.PI * 2;
-        const radius = 60.5;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        return (
-          <mesh key={`curb-outer-${i}`} position={[x, 0.1, z]} rotation={[-Math.PI / 2, 0, angle]} receiveShadow>
-            <planeGeometry args={[0.8, 4]} />
-            <meshStandardMaterial map={curbTexture} />
-          </mesh>
-        );
-      })}
-
-      <mesh position={[-50, 0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[15, 8]} />
-        <meshStandardMaterial color="#ffffff" transparent opacity={0.8} />
-      </mesh>
-
-      <mesh position={[-48, 0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[2, 12]} />
-        <meshStandardMaterial color="#000000" transparent opacity={0.6} />
-      </mesh>
-      <mesh position={[-46, 0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[2, 12]} />
-        <meshStandardMaterial color="#ffffff" transparent opacity={0.6} />
-      </mesh>
-
-      {[...Array(8)].map((_, i) => (
-        <mesh key={i} position={[-40 + i * 10, 0.6, -35]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.5, 16]} />
-          <meshStandardMaterial color="#ff6600" emissive="#ff6600" emissiveIntensity={0.3} />
-        </mesh>
-      ))}
-
-      {[...Array(32)].map((_, i) => {
-        const angle = (i / 32) * Math.PI * 2;
-        const radius = 65;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        return (
-          <mesh key={`barrier-${i}`} position={[x, 1, z]} castShadow>
-            <boxGeometry args={[2, 2, 0.5]} />
-            <meshStandardMaterial color="#ff0000" />
-          </mesh>
-        );
-      })}
-
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
-        <planeGeometry args={[200, 200]} />
-        <meshStandardMaterial color="#2d5016" />
-      </mesh>
-
-      <AnimatedCrowd position={[70, 3, 0]} />
-      <AnimatedCrowd position={[-70, 3, 0]} />
-      <AnimatedCrowd position={[0, 3, 70]} />
-      <AnimatedCrowd position={[0, 3, -70]} />
-
-      <WavingFlags position={[-45, 5, 10]} />
-      <WavingFlags position={[-45, 5, -10]} />
-      <WavingFlags position={[45, 5, 10]} />
-      <WavingFlags position={[45, 5, -10]} />
-
-      <PitCrew position={[-35, 2, -35]} />
-    </group>
-  );
-}
-
 function DynamicLighting({ weather }: { weather: WeatherType }) {
   const directionalLightRef = useRef<THREE.DirectionalLight>(null);
   
@@ -363,8 +97,8 @@ function DynamicLighting({ weather }: { weather: WeatherType }) {
     }
   });
 
-  const ambientIntensity = weather === 'sunny' ? 0.7 : weather === 'overcast' ? 0.5 : 0.4;
-  const directionalIntensity = weather === 'sunny' ? 1.5 : weather === 'overcast' ? 0.9 : 0.6;
+  const ambientIntensity = weather === 'sunny' ? 0.8 : weather === 'overcast' ? 0.6 : 0.5;
+  const directionalIntensity = weather === 'sunny' ? 1.8 : weather === 'overcast' ? 1.0 : 0.7;
   const skyColor = weather === 'sunny' ? '#87CEEB' : weather === 'overcast' ? '#6B7280' : '#4B5563';
   const groundColor = weather === 'sunny' ? '#654321' : '#3E2723';
 
@@ -450,629 +184,454 @@ function RainEffect() {
 
 function Scene({ 
   players, 
-  weather 
+  weather,
+  onLapComplete,
 }: { 
   players: PlayerCar[]; 
   weather: WeatherType;
+  onLapComplete: () => void;
 }) {
-  const { camera } = useThree();
   const playerCar = players.find(p => p.isPlayer);
-  const cameraVelocity = useRef(new THREE.Vector3());
-  const cameraShake = useRef({ x: 0, y: 0, z: 0 });
-  const impactIntensity = useRef(0);
+  const controls = useCarControls();
+  const lastLapRef = useRef(0);
 
-  useFrame((state, delta) => {
-    if (playerCar) {
-      const targetPos = new THREE.Vector3(
-        playerCar.position.x - Math.sin(playerCar.rotation) * 15,
-        Math.max(playerCar.position.y + 8, 3),
-        playerCar.position.z - Math.cos(playerCar.rotation) * 15
-      );
-
-      const speed = Math.abs(playerCar.velocity);
-      const speedLag = 1 + (speed / 60) * 0.3;
-      const laggedTarget = targetPos.clone().lerp(
-        new THREE.Vector3(
-          playerCar.position.x - Math.sin(playerCar.rotation) * (15 + speedLag),
-          targetPos.y,
-          playerCar.position.z - Math.cos(playerCar.rotation) * (15 + speedLag)
-        ),
-        0.3
-      );
-
-      const smoothing = 0.08;
-      cameraVelocity.current.lerp(
-        laggedTarget.clone().sub(camera.position),
-        smoothing
-      );
-      camera.position.add(cameraVelocity.current.multiplyScalar(delta * 10));
-
-      const speedShake = (speed / 60) * 0.02;
-      cameraShake.current.x = (Math.random() - 0.5) * speedShake;
-      cameraShake.current.y = (Math.random() - 0.5) * speedShake * 0.5;
-      cameraShake.current.z = (Math.random() - 0.5) * speedShake;
-
-      impactIntensity.current *= 0.9;
-      const impactShake = impactIntensity.current * 0.5;
-      cameraShake.current.x += (Math.random() - 0.5) * impactShake;
-      cameraShake.current.y += (Math.random() - 0.5) * impactShake;
-
-      const lookTarget = playerCar.position.clone();
-      lookTarget.x += cameraShake.current.x;
-      lookTarget.y += cameraShake.current.y;
-      lookTarget.z += cameraShake.current.z;
-      camera.lookAt(lookTarget);
+  useChaseCamera(
+    playerCar?.position || new THREE.Vector3(),
+    playerCar?.rotation || 0,
+    playerCar?.velocity || 0,
+    {
+      followDistance: 12,
+      followHeight: 5,
+      smoothing: 0.12,
+      lookAhead: 3,
     }
-  });
+  );
+
+  useEffect(() => {
+    if (playerCar && playerCar.laps > lastLapRef.current) {
+      lastLapRef.current = playerCar.laps;
+      onLapComplete();
+    }
+  }, [playerCar?.laps, onLapComplete]);
 
   const fogColor = weather === 'sunny' ? '#87CEEB' : weather === 'overcast' ? '#6B7280' : '#4B5563';
-  const fogNear = weather === 'rainy' ? 30 : 50;
-  const fogFar = weather === 'rainy' ? 200 : 300;
+  const fogNear = weather === 'rainy' ? 40 : 60;
+  const fogFar = weather === 'rainy' ? 220 : 320;
 
   return (
     <>
+      <color attach="background" args={[fogColor]} />
+      <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
+      
       <DynamicLighting weather={weather} />
       
-      <Track weather={weather} />
+      <RealisticRoadCourseScene weather={weather} />
       
       {players.map((player, idx) => (
-        <F1Car
+        <RealisticSportsCoupeCar
           key={player.principal}
           position={player.position}
           rotation={player.rotation}
-          isPlayer={player.isPlayer}
-          carNumber={idx + 1}
           velocity={player.velocity}
           suspensionOffset={player.suspensionOffset}
+          isPlayer={player.isPlayer}
         />
       ))}
 
-      {weather === 'rainy' && <RainEffect />}
+      <AnimatedCrowd position={[75, 3, 0]} />
+      <AnimatedCrowd position={[-75, 3, 0]} />
+      <AnimatedCrowd position={[0, 3, 75]} />
+      <AnimatedCrowd position={[0, 3, -75]} />
 
-      <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
+      <WavingFlags position={[-45, 5, 10]} />
+      <WavingFlags position={[-45, 5, -10]} />
+      <WavingFlags position={[45, 5, 10]} />
+      <WavingFlags position={[45, 5, -10]} />
+
+      {weather === 'rainy' && <RainEffect />}
     </>
   );
 }
 
-export default function F1RaceTrack({ trackId = 'f1Track', matchedPlayers = [] }: { trackId?: string; matchedPlayers?: string[] }) {
+function RaceSimulation({ 
+  players, 
+  setPlayers, 
+  weather,
+  onLapComplete,
+}: { 
+  players: PlayerCar[]; 
+  setPlayers: React.Dispatch<React.SetStateAction<PlayerCar[]>>;
+  weather: WeatherType;
+  onLapComplete: () => void;
+}) {
+  const controls = useCarControls();
+  const { actor } = useActor();
+  const { identity } = useInternetIdentity();
+
+  useFrame((state, delta) => {
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) => {
+        if (player.isPlayer) {
+          const maxSpeed = 80;
+          const acceleration = 35;
+          const braking = 50;
+          const friction = 8;
+
+          let newVelocity = player.velocity;
+
+          if (controls.forward) {
+            newVelocity += acceleration * delta;
+          } else if (controls.backward) {
+            newVelocity -= braking * delta;
+          } else {
+            newVelocity *= Math.pow(1 - friction / 100, delta * 60);
+          }
+
+          newVelocity = Math.max(-maxSpeed * 0.5, Math.min(maxSpeed, newVelocity));
+
+          const speed = Math.abs(newVelocity);
+          const steeringFactor = Math.max(0.3, 1 - speed / maxSpeed * 0.7);
+          const turnSpeed = 2.5 * steeringFactor;
+
+          let newRotation = player.rotation;
+          if (Math.abs(newVelocity) > 1) {
+            if (controls.left) {
+              newRotation += turnSpeed * delta * (newVelocity > 0 ? 1 : -1);
+            }
+            if (controls.right) {
+              newRotation -= turnSpeed * delta * (newVelocity > 0 ? 1 : -1);
+            }
+          }
+
+          const newPosition = player.position.clone();
+          newPosition.x += Math.sin(newRotation) * newVelocity * delta;
+          newPosition.z += Math.cos(newRotation) * newVelocity * delta;
+
+          const distanceFromCenter = Math.sqrt(newPosition.x ** 2 + newPosition.z ** 2);
+          const innerRadius = 38;
+          const outerRadius = 62;
+
+          if (distanceFromCenter < innerRadius) {
+            const angle = Math.atan2(newPosition.z, newPosition.x);
+            newPosition.x = Math.cos(angle) * innerRadius;
+            newPosition.z = Math.sin(angle) * innerRadius;
+            newVelocity *= 0.7;
+          } else if (distanceFromCenter > outerRadius) {
+            const angle = Math.atan2(newPosition.z, newPosition.x);
+            newPosition.x = Math.cos(angle) * outerRadius;
+            newPosition.z = Math.sin(angle) * outerRadius;
+            newVelocity *= 0.7;
+          }
+
+          const suspensionOffset = Math.sin(state.clock.elapsedTime * 15 + player.position.x) * 0.02 * (speed / maxSpeed);
+
+          let newLaps = player.laps;
+          const angleFromStart = Math.atan2(newPosition.z, newPosition.x);
+          const prevAngleFromStart = Math.atan2(player.position.z, player.position.x);
+          
+          if (prevAngleFromStart < -Math.PI / 2 && angleFromStart > Math.PI / 2 && newPosition.x < -40) {
+            newLaps += 1;
+          }
+
+          return {
+            ...player,
+            position: newPosition,
+            rotation: newRotation,
+            velocity: newVelocity,
+            suspensionOffset,
+            laps: newLaps,
+          };
+        } else {
+          const aiSpeed = 25 + Math.sin(state.clock.elapsedTime * 0.5 + player.position.x) * 5;
+          const trackRadius = 50;
+          const newRotation = player.rotation + (aiSpeed / trackRadius) * delta;
+
+          const newPosition = new THREE.Vector3(
+            Math.cos(newRotation) * trackRadius,
+            0,
+            Math.sin(newRotation) * trackRadius
+          );
+
+          const suspensionOffset = Math.sin(state.clock.elapsedTime * 12) * 0.015;
+
+          return {
+            ...player,
+            position: newPosition,
+            rotation: newRotation + Math.PI / 2,
+            velocity: aiSpeed,
+            suspensionOffset,
+          };
+        }
+      })
+    );
+  });
+
+  return null;
+}
+
+export default function F1RaceTrack({ trackId = 'f1Track', matchedPlayers = [] }: F1RaceTrackProps) {
   const { actor } = useActor();
   const { identity } = useInternetIdentity();
   const [raceStarted, setRaceStarted] = useState(false);
-  const [players, setPlayers] = useState<PlayerCar[]>([]);
-  const [currentLap, setCurrentLap] = useState(1);
-  const [lapTime, setLapTime] = useState(0);
-  const [bestLapTime, setBestLapTime] = useState<number | null>(null);
   const [raceFinished, setRaceFinished] = useState(false);
-  const [position, setPosition] = useState(1);
+  const [currentLap, setCurrentLap] = useState(1);
+  const [totalLaps] = useState(3);
   const [weather, setWeather] = useState<WeatherType>('sunny');
-  const [engineVolume, setEngineVolume] = useState(0.3);
+  const [volume, setVolume] = useState(50);
 
-  const raceAudio = useRaceAudio(
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    {
-      autoPlay: false,
-      loop: true,
-      initialVolume: 0.5,
-    }
-  );
-
+  const raceAudio = useRaceAudio('/race-music.mp3', { autoPlay: false, loop: true, initialVolume: volume / 100 });
   const engineAudio = useEngineAudio();
 
-  const playerPositionRef = useRef(new THREE.Vector3(-50, 1, 0));
-  const playerRotationRef = useRef(0);
-  const playerVelocityRef = useRef(0);
-  const playerSuspensionRef = useRef(0);
-  const keysPressed = useRef<Set<string>>(new Set());
-  const startTimeRef = useRef<number>(Date.now());
-  const lastUpdateRef = useRef<number>(Date.now());
-  const checkpointRef = useRef(0);
+  const [players, setPlayers] = useState<PlayerCar[]>([
+    {
+      principal: identity?.getPrincipal().toString() || 'player',
+      position: new THREE.Vector3(-50, 0, 0),
+      rotation: 0,
+      velocity: 0,
+      laps: 0,
+      isPlayer: true,
+      suspensionOffset: 0,
+    },
+    {
+      principal: 'ai-1',
+      position: new THREE.Vector3(50, 0, 0),
+      rotation: Math.PI,
+      velocity: 25,
+      laps: 0,
+      isPlayer: false,
+      suspensionOffset: 0,
+    },
+  ]);
 
-  const totalLaps = 3;
+  const playerCar = players.find(p => p.isPlayer);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => keysPressed.current.add(e.key.toLowerCase());
-    const handleKeyUp = (e: KeyboardEvent) => keysPressed.current.delete(e.key.toLowerCase());
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (raceStarted && !raceFinished) {
-      raceAudio.play();
-      engineAudio.start();
-    } else {
-      raceAudio.stop();
-      engineAudio.stop();
+    if (raceStarted && playerCar) {
+      const speed = Math.abs(playerCar.velocity);
+      engineAudio.updateSpeed(speed);
     }
-  }, [raceStarted, raceFinished]);
+  }, [raceStarted, playerCar?.velocity, engineAudio]);
 
   useEffect(() => {
-    engineAudio.setVolume(engineVolume);
-  }, [engineVolume]);
+    raceAudio.setVolume(volume / 100);
+  }, [volume, raceAudio]);
 
   useEffect(() => {
-    if (!raceStarted) return;
-
-    const gameLoop = setInterval(() => {
-      const delta = 0.016;
-      const keys = keysPressed.current;
-
-      let throttle = 0;
-      let brake = 0;
-      let steering = 0;
-
-      if (keys.has('w') || keys.has('arrowup')) throttle = 1;
-      if (keys.has('s') || keys.has('arrowdown')) brake = 1;
-      if (keys.has('a') || keys.has('arrowleft')) steering = 1;
-      if (keys.has('d') || keys.has('arrowright')) steering = -1;
-
-      const gripMultiplier = weather === 'rainy' ? 0.6 : weather === 'overcast' ? 0.85 : 1.0;
-
-      if (throttle > 0) {
-        playerVelocityRef.current += throttle * delta * 60 * gripMultiplier;
-      }
-      if (brake > 0) {
-        playerVelocityRef.current -= brake * delta * 80 * gripMultiplier;
-      }
-
-      playerVelocityRef.current *= 0.98;
-      playerVelocityRef.current = Math.max(-20, Math.min(60, playerVelocityRef.current));
-
-      if (Math.abs(playerVelocityRef.current) > 1) {
-        const speed = Math.abs(playerVelocityRef.current);
-        const steeringSensitivity = Math.max(0.3, 1 - (speed / 60) * 0.5);
-        const steeringEffect = steering * delta * 2.5 * steeringSensitivity * gripMultiplier;
-        playerRotationRef.current += steeringEffect;
-      }
-
-      const targetSuspension = Math.abs(playerVelocityRef.current) > 30 ? -0.1 : 0;
-      playerSuspensionRef.current += (targetSuspension - playerSuspensionRef.current) * 0.1;
-
-      const moveX = Math.sin(playerRotationRef.current) * playerVelocityRef.current * delta;
-      const moveZ = Math.cos(playerRotationRef.current) * playerVelocityRef.current * delta;
-      playerPositionRef.current.x += moveX;
-      playerPositionRef.current.z += moveZ;
-
-      const distFromCenter = Math.sqrt(
-        playerPositionRef.current.x ** 2 + playerPositionRef.current.z ** 2
-      );
-      if (distFromCenter > 60 || distFromCenter < 38) {
-        const angle = Math.atan2(playerPositionRef.current.z, playerPositionRef.current.x);
-        const targetRadius = distFromCenter > 60 ? 60 : 38;
-        const penetration = Math.abs(distFromCenter - targetRadius);
-        const springForce = penetration * 0.3;
-        const damping = 0.85;
-        
-        playerPositionRef.current.x += (Math.cos(angle) * targetRadius - playerPositionRef.current.x) * springForce * delta * 10;
-        playerPositionRef.current.z += (Math.sin(angle) * targetRadius - playerPositionRef.current.z) * springForce * delta * 10;
-        playerVelocityRef.current *= damping;
-      }
-
-      if (playerPositionRef.current.x < -45 && Math.abs(playerPositionRef.current.z) < 10) {
-        if (checkpointRef.current === 1) {
-          const lapTimeMs = Date.now() - startTimeRef.current;
-          setLapTime(lapTimeMs);
-          
-          if (!bestLapTime || lapTimeMs < bestLapTime) {
-            setBestLapTime(lapTimeMs);
-          }
-
-          if (currentLap < totalLaps) {
-            setCurrentLap(prev => prev + 1);
-            startTimeRef.current = Date.now();
-            toast.success(`Lap ${currentLap} completed!`);
-          } else {
-            setRaceFinished(true);
-            toast.success('Race finished!');
-          }
-          checkpointRef.current = 0;
-        }
-      } else if (playerPositionRef.current.x > 0) {
-        checkpointRef.current = 1;
-      }
-
-      if (Date.now() - lastUpdateRef.current > 100 && actor && identity) {
-        lastUpdateRef.current = Date.now();
-        
-        const backendPosition: Position = {
-          checkpoint: checkpointRef.current,
-          position: Math.floor(distFromCenter * 100),
-        };
-
-        actor.updateCarState(
-          backendPosition,
-          playerVelocityRef.current,
-          playerRotationRef.current,
-          BigInt(currentLap)
-        ).catch(err => console.error('Failed to update car state:', err));
-      }
-
-      engineAudio.updateSpeed(playerVelocityRef.current);
-
-      setPlayers(prev => {
-        const updated = [...prev];
-        const playerIdx = updated.findIndex(p => p.isPlayer);
-        if (playerIdx >= 0) {
-          updated[playerIdx] = {
-            ...updated[playerIdx],
-            position: playerPositionRef.current.clone(),
-            rotation: playerRotationRef.current,
-            velocity: playerVelocityRef.current,
-            laps: currentLap,
-            suspensionOffset: playerSuspensionRef.current,
-          };
-        }
-        return updated;
-      });
-
-      setLapTime(Date.now() - startTimeRef.current);
-    }, 16);
-
-    return () => clearInterval(gameLoop);
-  }, [raceStarted, actor, identity, currentLap, bestLapTime, weather]);
-
-  useEffect(() => {
-    if (!raceStarted || !actor) return;
-
-    const fetchInterval = setInterval(async () => {
-      try {
-        const carStates = await actor.getRaceCarStates(trackId);
-        
-        setPlayers(prev => {
-          const myPrincipal = identity?.getPrincipal().toString();
-          const updated: PlayerCar[] = [];
-
-          const playerCar = prev.find(p => p.isPlayer);
-          if (playerCar) {
-            updated.push(playerCar);
-          }
-
-          carStates.forEach(([principal, carState]) => {
-            const principalStr = principal.toString();
-            if (principalStr !== myPrincipal && carState) {
-              const existingIdx = prev.findIndex(p => p.principal === principalStr);
-              const existing = existingIdx >= 0 ? prev[existingIdx] : null;
-
-              const angle = (Number(carState.position.position) / 100) * Math.PI * 2;
-              const radius = 50;
-              const pos = new THREE.Vector3(
-                Math.cos(angle) * radius,
-                1,
-                Math.sin(angle) * radius
-              );
-
-              updated.push({
-                principal: principalStr,
-                position: existing ? existing.position.lerp(pos, 0.3) : pos,
-                rotation: carState.direction,
-                velocity: carState.velocity,
-                laps: Number(carState.laps),
-                isPlayer: false,
-                suspensionOffset: 0,
-              });
-            }
-          });
-
-          return updated;
-        });
-      } catch (err) {
-        console.error('Failed to fetch race positions:', err);
-      }
-    }, 200);
-
-    return () => clearInterval(fetchInterval);
-  }, [raceStarted, actor, trackId, identity]);
+    // Auto-start race if coming from matchmaking
+    if (matchedPlayers.length > 0 && !raceStarted) {
+      handleStartRace();
+    }
+  }, [matchedPlayers]);
 
   const handleStartRace = async () => {
-    if (!actor) {
-      toast.error('Backend not available');
+    if (!actor || !identity) {
+      toast.error('Please log in to start racing');
       return;
     }
 
     try {
       await actor.startRace(trackId);
-      
-      const myPrincipal = identity?.getPrincipal().toString() || 'player';
-      const initialPlayers: PlayerCar[] = [
-        {
-          principal: myPrincipal,
-          position: playerPositionRef.current.clone(),
-          rotation: 0,
-          velocity: 0,
-          laps: 1,
-          isPlayer: true,
-          suspensionOffset: 0,
-        },
-      ];
-
-      matchedPlayers.forEach((principal, idx) => {
-        if (principal !== myPrincipal) {
-          initialPlayers.push({
-            principal,
-            position: new THREE.Vector3(-50, 1, (idx + 1) * 3),
-            rotation: 0,
-            velocity: 0,
-            laps: 1,
-            isPlayer: false,
-            suspensionOffset: 0,
-          });
-        }
-      });
-
-      setPlayers(initialPlayers);
       setRaceStarted(true);
-      startTimeRef.current = Date.now();
-      toast.success('Race started! Full Throttle! 🏁');
-    } catch (err) {
+      setCurrentLap(1);
+      setRaceFinished(false);
+      raceAudio.play();
+      engineAudio.start();
+      toast.success('Race started! Good luck!');
+    } catch (error) {
+      console.error('Failed to start race:', error);
       toast.error('Failed to start race');
-      console.error(err);
     }
   };
 
-  const formatTime = (ms: number) => {
-    const seconds = Math.floor(ms / 1000);
-    const milliseconds = Math.floor((ms % 1000) / 10);
-    return `${seconds}.${milliseconds.toString().padStart(2, '0')}s`;
-  };
-
-  const getWeatherIcon = (w: WeatherType) => {
-    switch (w) {
-      case 'sunny': return <Sun className="h-4 w-4" />;
-      case 'overcast': return <Cloud className="h-4 w-4" />;
-      case 'rainy': return <CloudRain className="h-4 w-4" />;
+  const handleLapComplete = () => {
+    if (currentLap < totalLaps) {
+      setCurrentLap((prev) => prev + 1);
+      toast.success(`Lap ${currentLap} complete!`);
+    } else if (currentLap === totalLaps && !raceFinished) {
+      handleFinishRace();
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Flag className="h-5 w-5 text-primary" />
-            F1 Racing Track - Full Throttle
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-4 gap-2">
-            <Card className="bg-card/50">
-              <CardContent className="pt-4 pb-2">
-                <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Lap</p>
-                    <p className="text-xl font-bold">{currentLap}/{totalLaps}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+  const handleFinishRace = async () => {
+    setRaceFinished(true);
+    raceAudio.stop();
+    engineAudio.stop();
+    toast.success('Race finished! Well done!');
 
-            <Card className="bg-card/50">
-              <CardContent className="pt-4 pb-2">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Time</p>
-                    <p className="text-xl font-bold">{formatTime(lapTime)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+    if (actor) {
+      try {
+        await actor.finishRace(trackId);
+      } catch (error) {
+        console.error('Failed to finish race:', error);
+      }
+    }
+  };
 
-            <Card className="bg-card/50">
-              <CardContent className="pt-4 pb-2">
-                <div className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Best</p>
-                    <p className="text-xl font-bold">{bestLapTime ? formatTime(bestLapTime) : '--'}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+  const handleBackToMenu = () => {
+    setRaceStarted(false);
+    setRaceFinished(false);
+    setCurrentLap(1);
+    raceAudio.stop();
+    engineAudio.stop();
+    setPlayers([
+      {
+        principal: identity?.getPrincipal().toString() || 'player',
+        position: new THREE.Vector3(-50, 0, 0),
+        rotation: 0,
+        velocity: 0,
+        laps: 0,
+        isPlayer: true,
+        suspensionOffset: 0,
+      },
+      {
+        principal: 'ai-1',
+        position: new THREE.Vector3(50, 0, 0),
+        rotation: Math.PI,
+        velocity: 25,
+        laps: 0,
+        isPlayer: false,
+        suspensionOffset: 0,
+      },
+    ]);
+  };
 
-            <Card className="bg-card/50">
-              <CardContent className="pt-4 pb-2">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Position</p>
-                    <p className="text-xl font-bold">{position}/{players.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {!raceStarted && (
-            <Card className="bg-card/50">
-              <CardContent className="pt-4 pb-2">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium">Weather:</span>
-                  <Select value={weather} onValueChange={(value) => setWeather(value as WeatherType)}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sunny">
-                        <div className="flex items-center gap-2">
-                          <Sun className="h-4 w-4" />
-                          Sunny
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="overcast">
-                        <div className="flex items-center gap-2">
-                          <Cloud className="h-4 w-4" />
-                          Overcast
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="rainy">
-                        <div className="flex items-center gap-2">
-                          <CloudRain className="h-4 w-4" />
-                          Rainy
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {raceStarted && !raceFinished && (
-            <Card className="bg-card/50">
-              <CardContent className="pt-4 pb-2 space-y-3">
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={raceAudio.toggleMute}
-                    className="flex-shrink-0"
-                  >
-                    {raceAudio.isMuted ? (
-                      <VolumeX className="h-5 w-5" />
-                    ) : (
-                      <Volume2 className="h-5 w-5" />
-                    )}
-                  </Button>
-                  <div className="flex-1">
+  if (!raceStarted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 p-4">
+        <Card className="w-full max-w-md border-purple-500/30 bg-black/40 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl text-white">
+              <Flag className="h-6 w-6 text-purple-400" />
+              F1 Race Track
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-white">Weather Conditions</label>
+              <Select value={weather} onValueChange={(value) => setWeather(value as WeatherType)}>
+                <SelectTrigger className="border-purple-500/30 bg-black/20 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sunny">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">Music</span>
-                      <Slider
-                        value={[raceAudio.volume * 100]}
-                        onValueChange={(values) => raceAudio.setVolume(values[0] / 100)}
-                        max={100}
-                        step={1}
-                        className="flex-1"
-                      />
-                      <span className="text-xs text-muted-foreground w-8 text-right">
-                        {Math.round(raceAudio.volume * 100)}%
-                      </span>
+                      <Sun className="h-4 w-4" />
+                      Sunny
                     </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 flex-shrink-0" />
-                  <div className="flex-1">
+                  </SelectItem>
+                  <SelectItem value="overcast">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">Engine</span>
-                      <Slider
-                        value={[engineVolume * 100]}
-                        onValueChange={(values) => setEngineVolume(values[0] / 100)}
-                        max={100}
-                        step={1}
-                        className="flex-1"
-                      />
-                      <span className="text-xs text-muted-foreground w-8 text-right">
-                        {Math.round(engineVolume * 100)}%
-                      </span>
+                      <Cloud className="h-4 w-4" />
+                      Overcast
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                  </SelectItem>
+                  <SelectItem value="rainy">
+                    <div className="flex items-center gap-2">
+                      <CloudRain className="h-4 w-4" />
+                      Rainy
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="relative w-full h-[500px] rounded-lg overflow-hidden border-2 border-border bg-gradient-to-b from-sky-400 to-sky-200">
-            <Canvas 
-              shadows 
-              camera={{ position: [-60, 10, 0], fov: 75 }}
-              gl={{ 
-                outputColorSpace: THREE.SRGBColorSpace,
-                toneMapping: THREE.ACESFilmicToneMapping,
-                toneMappingExposure: 1.2
-              }}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-white">Music Volume</label>
+                <Badge variant="outline" className="border-purple-500/30 text-white">
+                  {volume}%
+                </Badge>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={raceAudio.toggleMute}
+                  className="text-white hover:bg-purple-500/20"
+                >
+                  {raceAudio.isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                </Button>
+                <Slider
+                  value={[volume]}
+                  onValueChange={(value) => setVolume(value[0])}
+                  max={100}
+                  step={1}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2 rounded-lg border border-purple-500/30 bg-purple-500/10 p-4">
+              <div className="flex items-center justify-between text-sm text-white">
+                <span>Total Laps:</span>
+                <Badge variant="secondary">{totalLaps}</Badge>
+              </div>
+              <div className="flex items-center justify-between text-sm text-white">
+                <span>Opponents:</span>
+                <Badge variant="secondary">{matchedPlayers.length > 0 ? matchedPlayers.length : 1} AI</Badge>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleStartRace}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-lg font-bold hover:from-purple-700 hover:to-blue-700"
+              size="lg"
             >
-              <Scene players={players} weather={weather} />
-            </Canvas>
-
-            {raceStarted && !raceFinished && (
-              <div className="absolute bottom-4 left-4 bg-black/70 text-white px-4 py-2 rounded-lg text-sm">
-                <p className="font-semibold mb-1">Controls:</p>
-                <p>W/↑ - Accelerate</p>
-                <p>S/↓ - Brake</p>
-                <p>A/← - Turn Left</p>
-                <p>D/→ - Turn Right</p>
-              </div>
-            )}
-
-            {raceStarted && !raceFinished && (
-              <div className="absolute top-4 right-4 bg-black/70 text-white px-6 py-3 rounded-lg">
-                <p className="text-xs text-gray-300">Speed</p>
-                <p className="text-3xl font-bold">{Math.abs(Math.floor(playerVelocityRef.current))}</p>
-                <p className="text-xs text-gray-300">km/h</p>
-              </div>
-            )}
-
-            {raceStarted && !raceFinished && (
-              <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg flex items-center gap-2">
-                {getWeatherIcon(weather)}
-                <span className="text-xs capitalize">{weather}</span>
-              </div>
-            )}
-
-            {raceStarted && !raceFinished && raceAudio.isPlaying && (
-              <div className="absolute top-16 left-4 bg-black/70 text-white px-3 py-2 rounded-lg flex items-center gap-2">
-                <Volume2 className="h-4 w-4 animate-pulse" />
-                <span className="text-xs">Music</span>
-              </div>
-            )}
-          </div>
-
-          {!raceStarted && (
-            <Button onClick={handleStartRace} size="lg" className="w-full">
               <Flag className="mr-2 h-5 w-5" />
               Start Race
             </Button>
-          )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-          {raceFinished && (
-            <Card className="border-green-500 bg-green-500/10">
-              <CardContent className="pt-6 text-center">
-                <Trophy className="h-12 w-12 mx-auto mb-2 text-green-500" />
-                <h3 className="text-2xl font-bold mb-2">Race Complete!</h3>
-                <p className="text-muted-foreground">Final Position: {position}/{players.length}</p>
-                <p className="text-muted-foreground">Best Lap: {bestLapTime ? formatTime(bestLapTime) : '--'}</p>
-                <Button onClick={() => window.location.reload()} className="mt-4">
-                  Race Again
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+  return (
+    <div className="relative h-screen w-full">
+      <Canvas
+        shadows
+        gl={{
+          antialias: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.2,
+          outputColorSpace: THREE.SRGBColorSpace,
+        }}
+        camera={{ position: [0, 10, 20], fov: 75 }}
+      >
+        <Scene players={players} weather={weather} onLapComplete={handleLapComplete} />
+        <RaceSimulation players={players} setPlayers={setPlayers} weather={weather} onLapComplete={handleLapComplete} />
+      </Canvas>
 
-          {raceStarted && players.length > 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Race Positions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {players
-                    .sort((a, b) => b.laps - a.laps)
-                    .map((player, idx) => (
-                      <div key={player.principal} className="flex items-center justify-between p-2 rounded bg-muted/50">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={player.isPlayer ? 'default' : 'secondary'}>
-                            {idx + 1}
-                          </Badge>
-                          <span className="text-sm font-medium">
-                            {player.isPlayer ? 'You' : `Player ${player.principal.slice(0, 8)}...`}
-                          </span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">Lap {player.laps}</span>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </CardContent>
-      </Card>
+      <RaceHUDOverlay
+        currentLap={currentLap}
+        totalLaps={totalLaps}
+        speed={playerCar?.velocity || 0}
+      />
+
+      {raceFinished && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <Card className="w-full max-w-md border-purple-500/30 bg-black/60 backdrop-blur-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl text-white">
+                <Trophy className="h-6 w-6 text-yellow-400" />
+                Race Complete!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2 text-center">
+                <p className="text-lg text-white">Congratulations!</p>
+                <p className="text-sm text-gray-300">You completed {totalLaps} laps</p>
+              </div>
+              <Button
+                onClick={handleBackToMenu}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              >
+                Back to Menu
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

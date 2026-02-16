@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-new-store-page-reachable-at-a-dedicated-route-e-g-store-and-make-it-accessible-via-a-clearly-labeled-button-on-the-main-menu-menu-tab-that-navigates-to-the-store-page",
-      "featureTitle": "Add a new Store page reachable at a dedicated route (e.g., \"/store\") and make it accessible via a clearly labeled button on the Main Menu \"Menu\" tab that navigates to the Store page.",
+      "featureId": "feature-update-the-in-race-player-car-visual-model-in-the-3d-race-scene-to-look-realistically-like-the-uploaded-reference-screenshot-a-modern-wide-body-sports-coupe-seen-from-the-rear-primarily-yellow-bodywork-with-a-rainbow-gradient-accent-across-the-rear-and-a-prominent-rear-spoiler-rendered-with-more-realistic-materials-paint-glass-rubber-than-the-current-boxy-placeholder-car",
+      "featureTitle": "Update the in-race player car visual model in the 3D race scene to look realistically like the uploaded reference screenshot: a modern wide-body sports coupe seen from the rear, primarily yellow bodywork, with a rainbow/gradient accent across the rear and a prominent rear spoiler, rendered with more realistic materials (paint + glass + rubber) than the current boxy placeholder car.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/MainMenu.tsx",
-        "frontend/src/pages/Store.tsx"
+        "frontend/src/components/F1RaceTrack.tsx",
+        "frontend/src/components/race/RealisticSportsCoupeCar.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -25,12 +24,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-the-store-catalog-ui-listing-neon-light-items-purchasable-with-xp-with-the-following-items-and-xp-costs-red-100-blue-100-yellow-100-purple-100-orange-100-multicolor-1000-and-white-25-show-the-user-s-current-xp-balance-on-the-store-page",
-      "featureTitle": "Implement the Store catalog UI listing neon light items purchasable with XP, with the following items and XP costs: red=100, blue=100, yellow=100, purple=100, orange=100, multicolor=1000, and white=25. Show the user’s current XP balance on the Store page.",
+      "featureId": "feature-make-the-racing-environment-track-look-more-realistic-and-closer-in-look-and-feel-to-the-uploaded-screenshot-a-road-course-with-asphalt-grass-verges-red-white-curbs-guardrails-barriers-and-trackside-scenery-with-lighting-fog-tuned-for-realism",
+      "featureTitle": "Make the racing environment/track look more realistic and closer in look-and-feel to the uploaded screenshot: a road course with asphalt, grass verges, red/white curbs, guardrails/barriers, and trackside scenery, with lighting/fog tuned for realism.",
       "files": [
-        "frontend/src/components/store/StoreItemCard.tsx",
-        "frontend/src/components/store/storeCatalog.ts",
-        "frontend/src/pages/Store.tsx"
+        "frontend/src/components/F1RaceTrack.tsx",
+        "frontend/src/components/race/RealisticRoadCourseScene.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -48,11 +46,34 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-collectible-xp-coins-to-the-race-track-gameplay-such-that-1-xp-and-5-xp-coins-appear-commonly-on-the-track-while-10-xp-and-20-xp-coins-appear-in-hidden-places-and-or-become-obtainable-after-the-player-performs-an-amazing-stunt-during-a-race-collecting-a-coin-must-automatically-add-its-xp-value-to-the-player-s-total-xp-used-in-the-store",
-      "featureTitle": "Add collectible XP coins to the race track gameplay such that 1 XP and 5 XP coins appear commonly on the track, while 10 XP and 20 XP coins appear in hidden places and/or become obtainable after the player performs an \"amazing stunt\" during a race. Collecting a coin must automatically add its XP value to the player’s total XP (used in the Store).",
+      "featureId": "feature-ensure-the-player-can-drive-the-car-player-controlled-drivable-gameplay-in-the-realistic-scene-with-responsive-controls-including-acceleration-brake-and-steering-and-with-a-stable-third-person-chase-camera-similar-to-the-reference-perspective-behind-the-car-view",
+      "featureTitle": "Ensure the player can drive the car (player-controlled drivable gameplay) in the realistic scene with responsive controls, including acceleration/brake and steering, and with a stable third-person chase camera similar to the reference perspective (behind-the-car view).",
       "files": [
-        "frontend/src/components/race/RaceXPHUD.tsx",
-        "frontend/src/components/race/XPCoinTypes.ts"
+        "frontend/src/components/F1RaceTrack.tsx",
+        "frontend/src/components/race/useCarControls.ts",
+        "frontend/src/components/race/useChaseCamera.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "stripe@3.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-simple-hud-overlay-inspired-by-the-reference-screenshot-that-shows-at-minimum-current-lap-total-laps-and-current-speed-readout-in-a-clean-readable-style-that-does-not-block-the-center-of-the-screen",
+      "featureTitle": "Add a simple HUD overlay inspired by the reference screenshot that shows at minimum: current lap/total laps and current speed readout, in a clean, readable style that does not block the center of the screen.",
+      "files": [
+        "frontend/src/components/F1RaceTrack.tsx",
+        "frontend/src/components/race/RaceHUDOverlay.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -70,10 +91,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-define-and-implement-an-in-race-amazing-stunt-detection-heuristic-using-only-in-game-telemetry-available-in-the-current-race-implementation-that-when-triggered-enables-access-to-higher-value-coins-10-20-as-described-by-the-user",
-      "featureTitle": "Define and implement an in-race \"amazing stunt\" detection heuristic (using only in-game telemetry available in the current race implementation) that, when triggered, enables access to higher-value coins (10/20) as described by the user.",
+      "featureId": "feature-add-any-new-required-static-art-assets-textures-decals-as-generated-images-under-frontend-public-assets-generated-and-reference-them-directly-from-the-frontend-car-track-rendering",
+      "featureTitle": "Add any new required static art assets (textures/decals) as generated images under frontend/public/assets/generated and reference them directly from the frontend car/track rendering.",
       "files": [
-        "frontend/src/components/race/stuntDetection.ts"
+        "frontend/src/components/race/RealisticRoadCourseScene.tsx",
+        "frontend/src/components/race/RealisticSportsCoupeCar.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -87,72 +109,6 @@
       ],
       "testIds": [
         "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-a-cohesive-neon-racing-visual-theme-for-the-store-experience-and-any-new-xp-coin-ui-elements-using-a-distinct-palette-and-typography-that-fits-neon-lights-apply-it-consistently-across-new-store-components-and-coin-related-hud-elements-without-changing-existing-read-only-ui-component-sources",
-      "featureTitle": "Create a cohesive neon-racing visual theme for the Store experience (and any new XP/coin UI elements), using a distinct palette and typography that fits neon lights. Apply it consistently across new Store components and coin-related HUD elements without changing existing read-only UI component sources.",
-      "files": [
-        "frontend/src/components/race/RaceXPHUD.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/Store.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-frontend-query-mutation-wiring-react-query-to-load-xp-owned-neon-lights-and-to-purchase-items-ensuring-ui-updates-immediately-after-successful-purchase-and-after-xp-is-earned-from-coin-pickups",
-      "featureTitle": "Add frontend query/mutation wiring (React Query) to load XP + owned neon lights and to purchase items, ensuring UI updates immediately after successful purchase and after XP is earned from coin pickups.",
-      "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/Store.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-generated-static-image-assets-for-the-store-neon-light-thumbnails-and-xp-coin-visuals-and-render-them-in-the-store-page-and-in-race-ui-as-appropriate-store-images-must-be-placed-under-frontend-public-assets-generated-and-referenced-directly-by-the-frontend-not-served-through-the-backend",
-      "featureTitle": "Add generated static image assets for the Store neon light thumbnails and XP coin visuals, and render them in the Store page and in-race UI as appropriate. Store images must be placed under \"frontend/public/assets/generated\" and referenced directly by the frontend (not served through the backend).",
-      "files": [
-        "frontend/src/pages/Store.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "stripe@3.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-8"
       ],
       "confidence": "high"
     }

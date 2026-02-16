@@ -1,184 +1,122 @@
 {
   "kind": "build_request",
-  "title": "Add XP coin pickups and a neon-light Store page accessible from Main Menu",
+  "title": "Realistic drivable car + realistic track scene matching the reference screenshot",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a new Store page reachable at a dedicated route (e.g., \"/store\") and make it accessible via a clearly labeled button on the Main Menu \"Menu\" tab that navigates to the Store page.",
+      "text": "Update the in-race player car visual model in the 3D race scene to look realistically like the uploaded reference screenshot: a modern wide-body sports coupe seen from the rear, primarily yellow bodywork, with a rainbow/gradient accent across the rear and a prominent rear spoiler, rendered with more realistic materials (paint + glass + rubber) than the current boxy placeholder car.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "1.it can access by a button in the menu page that leads to its  store page."
+          "i want the car to look like this",
+          "1. yes. 2. yes, make it more realistic like that one. 3. the car should be drivable by the player"
         ]
       },
       "acceptanceCriteria": [
-        "Main menu contains a visible \"Store\" button on the \"Menu\" tab.",
-        "Clicking the \"Store\" button navigates to the Store page without a full page reload.",
-        "There is an obvious way to return from the Store page back to the Main Menu."
+        "When launching the race scene (currently via Matchmaking -> Accept Match), the player's car is visually a realistic sports coupe (not the current simple box-based model).",
+        "The player car’s primary color reads as yellow, includes a visible rear rainbow/gradient accent, and has a clear rear spoiler element.",
+        "Car materials visually differ (e.g., glossy painted body, darker glass, rubber tires) under scene lighting."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement the Store catalog UI listing neon light items purchasable with XP, with the following items and XP costs: red=100, blue=100, yellow=100, purple=100, orange=100, multicolor=1000, and white=25. Show the user’s current XP balance on the Store page.",
+      "text": "Make the racing environment/track look more realistic and closer in look-and-feel to the uploaded screenshot: a road course with asphalt, grass verges, red/white curbs, guardrails/barriers, and trackside scenery, with lighting/fog tuned for realism.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6",
-          "msg-8"
+          "msg-1"
         ],
         "quotes": [
-          "add a store page with different types of neon lights. the colors are red, blue, yellow, purple, white, orange and multicolor neon and every single one costs 100 except for the white, which costs 25 and the currency to buy these items is xp you earn in the race and the multicolored costs 1000",
-          "make a store page so they can access the store."
+          "2. yes, make it more realistic like that one."
         ]
       },
       "acceptanceCriteria": [
-        "Store page shows all 7 neon light items with the exact XP prices specified by the user.",
-        "Store page displays the player’s current XP balance (numeric) in a prominent location.",
-        "Each item shows one of these states based on backend data: \"Buy\" (locked), \"Owned\" (unlocked).",
-        "If the user has insufficient XP, the UI prevents purchase and shows an English error message (e.g., \"Not enough XP\")."
+        "The track environment includes visible asphalt surface, grass off-track areas, and red/white curbing.",
+        "Trackside barriers/guardrails are present and visually consistent along the circuit.",
+        "Lighting and post effects (fog/sky) produce a more realistic outdoor track appearance than the current stylized arena-like ring."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add backend support for XP as a player currency and permanent unlocks for purchased neon lights, persisted per authenticated player. Expose backend methods for: fetching current XP + owned neon lights, purchasing a neon light (deduct XP and mark owned), and crediting XP earned from races/coin pickups.",
-      "target": "backend",
+      "text": "Ensure the player can drive the car (player-controlled drivable gameplay) in the realistic scene with responsive controls, including acceleration/brake and steering, and with a stable third-person chase camera similar to the reference perspective (behind-the-car view).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6",
-          "msg-8"
+          "msg-1"
         ],
         "quotes": [
-          "the currency to buy these items is xp you earn in the race",
-          "2.permanently unlock. 3. put xp coins that cost 1, 5, 10, and even 20."
+          "3. the car should be drivable by the player"
         ]
       },
       "acceptanceCriteria": [
-        "Neon light purchases persist across page reloads and new sessions for the same Internet Identity principal.",
-        "Purchase attempts fail with a clear error when XP is insufficient, and do not change XP or ownership state.",
-        "A successful purchase deducts the correct XP amount and immediately reflects as owned when re-fetched.",
-        "XP balance can be increased via a dedicated backend method so the frontend can credit coin pickups."
+        "Keyboard controls allow driving the car (accelerate/brake + steering) and the car’s position/rotation updates accordingly.",
+        "The camera follows behind the car in a chase view that keeps the car centered similarly to the reference screenshot while driving.",
+        "Driving remains playable without jitter (no extreme camera shaking or instability during normal driving)."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Add collectible XP coins to the race track gameplay such that 1 XP and 5 XP coins appear commonly on the track, while 10 XP and 20 XP coins appear in hidden places and/or become obtainable after the player performs an \"amazing stunt\" during a race. Collecting a coin must automatically add its XP value to the player’s total XP (used in the Store).",
-      "target": "both",
+      "text": "Add a simple HUD overlay inspired by the reference screenshot that shows at minimum: current lap/total laps and current speed readout, in a clean, readable style that does not block the center of the screen.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8",
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "put xp coins that cost 1, 5, 10, and even 20.",
-          "The 1 and 5 point xp coins can appear usually on  the track but in hidden places or after doing an amazing stunt you can find the 10 and 20 point coins"
+          "yes, make it more realistic like that one."
         ]
       },
       "acceptanceCriteria": [
-        "During a race, the player can collect XP coins and see their XP increase without needing to manually refresh.",
-        "1 XP and 5 XP coins appear in normal/on-track locations with noticeably higher frequency than 10/20 coins.",
-        "10 XP and 20 XP coins are not commonly visible on the main racing line; they are placed in hidden/off-line locations and/or appear after the stunt condition is met.",
-        "Coin collection cannot be repeated for the same coin instance (i.e., a collected coin is removed/marked collected)."
+        "During the race, UI displays lap progress (e.g., \"Lap 1/3\") and a speed value that changes as the car accelerates/brakes.",
+        "HUD elements are readable on top of the 3D scene and are placed away from the screen center."
       ]
     },
     {
       "id": "REQ-5",
-      "text": "Define and implement an in-race \"amazing stunt\" detection heuristic (using only in-game telemetry available in the current race implementation) that, when triggered, enables access to higher-value coins (10/20) as described by the user.",
+      "text": "Add any new required static art assets (textures/decals) as generated images under frontend/public/assets/generated and reference them directly from the frontend car/track rendering.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "after doing an amazing stunt you can find the 10 and 20 point coins"
+          "i want the car to look like this"
         ]
       },
       "acceptanceCriteria": [
-        "There is an explicit, documented stunt trigger condition implemented in the race code (e.g., airtime + landing, speed + jump, sharp drift + speed, etc.) that can be reliably achieved in gameplay.",
-        "When the stunt triggers, at least one 10 XP or 20 XP coin becomes obtainable (e.g., spawned or revealed) during that race.",
-        "The stunt trigger does not fire continuously every frame; it has sensible gating/cooldown so it feels like an achievement."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Create a cohesive neon-racing visual theme for the Store experience (and any new XP/coin UI elements), using a distinct palette and typography that fits neon lights. Apply it consistently across new Store components and coin-related HUD elements without changing existing read-only UI component sources.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6",
-          "msg-9"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Store page has a consistent neon-inspired look (colors, spacing, typography, card styling) that is clearly differentiated from default styling.",
-        "New theme is applied consistently across Store list, XP balance display, and purchase states.",
-        "No edits are made to files under \"frontend/src/components/ui\" or any other immutable paths."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Add frontend query/mutation wiring (React Query) to load XP + owned neon lights and to purchase items, ensuring UI updates immediately after successful purchase and after XP is earned from coin pickups.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6",
-          "msg-8",
-          "msg-9"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Store page uses React Query to fetch the current XP and owned neon lights.",
-        "After purchasing an item, the Store UI updates to show the new XP total and the item as owned without requiring a hard refresh.",
-        "After collecting XP coins in a race, the player’s XP displayed in the Store is correct after navigating to the Store (and/or after a refetch)."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Add generated static image assets for the Store neon light thumbnails and XP coin visuals, and render them in the Store page and in-race UI as appropriate. Store images must be placed under \"frontend/public/assets/generated\" and referenced directly by the frontend (not served through the backend).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6",
-          "msg-8",
-          "msg-9"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All required images exist under \"frontend/public/assets/generated\" and are referenced via \"/assets/generated/...\" paths.",
-        "Store items display a thumbnail image for each neon light color.",
-        "XP coin pickups use coin images (or in-world sprites) that visually differentiate 1/5/10/20 values."
+        "All newly introduced textures/decals are stored in frontend/public/assets/generated and loaded directly by the frontend (e.g., via THREE.TextureLoader).",
+        "The realistic car appearance (yellow + rear gradient accent) is achieved using these static assets and/or materials in the scene."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in \"backend/main.mo\" (no additional backend services).",
-    "Do not edit immutable frontend paths: \"frontend/src/hooks/useInternetIdentity.ts\", \"frontend/src/hooks/useInternetIdentity.tsx\", \"frontend/src/hooks/useActor.ts\", \"frontend/src/main.tsx\", and any files under \"frontend/src/components/ui\"; compose them instead.",
-    "Use English for any user-facing text.",
-    "Store navigation must be implemented from the existing Main Menu page (\"frontend/src/pages/MainMenu.tsx\") via a button that routes to the Store page.",
-    "Persist permanent unlocks per Internet Identity principal."
+    "Do not edit files under frontend/src/components/ui (read-only UI component sources).",
+    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths).",
+    "Keep all backend logic (if any is needed) within the single Motoko actor in backend/main.mo; only add backend changes if required for the requested visuals/driving."
   ],
   "nonGoals": [
-    "Implementing real-money payments for the neon lights.",
-    "Adding third-party authentication beyond Internet Identity.",
-    "Adding external databases or off-chain storage for XP/inventory.",
-    "Multiplayer syncing of coin positions/collection across players in real time beyond what the current game supports."
+    "Building an exact 1:1 licensed recreation of the real-world track shown in the screenshot (no trademarked names/logos required).",
+    "Adding real-time multiplayer networking or authoritative physics simulation beyond the existing local/player control approach.",
+    "Adding third-party assets/services or external 3D model downloads."
   ],
   "imageRequirements": {
     "required": [
-      "Neon light icon thumbnail set: red, blue, yellow, purple, orange, white, multicolor (neon-light-red.dim_256x256.png; neon-light-blue.dim_256x256.png; neon-light-yellow.dim_256x256.png; neon-light-purple.dim_256x256.png; neon-light-orange.dim_256x256.png; neon-light-white.dim_256x256.png; neon-light-multicolor.dim_256x256.png)",
-      "XP coin sprites for values 1, 5, 10, 20 with clear numeric marking (xp-coin-1.dim_128x128.png; xp-coin-5.dim_128x128.png; xp-coin-10.dim_128x128.png; xp-coin-20.dim_128x128.png)"
+      "Realistic sports coupe livery/texture: yellow body with a rear rainbow gradient band (sports-coupe-livery.dim_2048x1024.png)",
+      "Asphalt road texture with subtle wear and variation (asphalt-realistic.dim_2048x2048.png)",
+      "Grass ground texture suitable for trackside verges (grass-verge.dim_2048x2048.png)",
+      "Trackside barrier/guardrail texture (guardrail-texture.dim_2048x512.png)",
+      "Red/white curb texture (curb-red-white-realistic.dim_2048x256.png)"
     ],
     "edits": []
   },
   "userProfileUpdate": {
     "goalsToAdd": [],
     "goalsToRemove": [],
-    "preferencesToAdd": [
-      "Use English for user-facing text"
-    ],
+    "preferencesToAdd": [],
     "preferencesToRemove": [],
     "miscToAdd": [],
     "miscToRemove": [],

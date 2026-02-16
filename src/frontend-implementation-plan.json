@@ -1,269 +1,138 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "XP coin pickups + neon Store page route and UI",
+  "title": "Realistic sports coupe + realistic road-course scene with drivable controls and HUD",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add a dedicated Store route and wire navigation from the Main Menu plus a clear return path.",
+      "summary": "Replace the in-race player car placeholder with a more realistic wide-body sports coupe (yellow with rear gradient accent and spoiler) using distinct paint/glass/rubber materials.",
       "acceptanceCriteria": [
-        "Main menu contains a visible \"Store\" button on the \"Menu\" tab.",
-        "Clicking the \"Store\" button navigates to the Store page without a full page reload.",
-        "There is an obvious way to return from the Store page back to the Main Menu."
+        "When launching the race scene (currently via Matchmaking -> Accept Match), the player's car is visually a realistic sports coupe (not the current simple box-based model).",
+        "The player car’s primary color reads as yellow, includes a visible rear rainbow/gradient accent, and has a clear rear spoiler element.",
+        "Car materials visually differ (e.g., glossy painted body, darker glass, rubber tires) under scene lighting."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Store.tsx",
+          "path": "frontend/src/components/race/RealisticSportsCoupeCar.tsx",
           "operation": "create",
-          "description": "Create the Store page view with a clearly labeled Back/Return control that navigates to the Main Menu using TanStack Router navigation. Use shadcn-ui components (e.g., Card, Button) for layout; verify the component's usage instructions before implementing."
+          "description": "Create a reusable react-three-fiber car model component representing a modern wide-body sports coupe from a rear/chase-view silhouette, including a prominent rear spoiler, separate meshes/materials for glossy yellow paint, darker glass, and rubber tires; load and apply the livery texture asset for the rear gradient accent. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/F1RaceTrack.tsx",
           "operation": "modify",
-          "description": "Register a new TanStack Router route for \"/store\" and wire it into the existing routeTree so navigation occurs client-side without full page reload."
-        },
-        {
-          "path": "frontend/src/pages/MainMenu.tsx",
-          "operation": "modify",
-          "description": "Add a visible, clearly labeled \"Store\" button within the \"Menu\" tab content that navigates to \"/store\" via TanStack Router. Use shadcn-ui Button for consistency; verify the component's usage instructions before implementing."
+          "description": "Replace/retire the current boxy in-scene player car rendering with the new RealisticSportsCoupeCar component for the local player (and keep/adjust a simpler model for other cars if desired), ensuring materials read as paint/glass/rubber under existing lighting. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Implement the neon Store catalog UI with exact item prices, owned/buy states, and show the player XP balance.",
+      "summary": "Upgrade the race environment to a more realistic road-course scene with asphalt, grass verges, red/white curbs, guardrails/barriers, and tuned outdoor lighting/fog.",
       "acceptanceCriteria": [
-        "Store page shows all 7 neon light items with the exact XP prices specified by the user.",
-        "Store page displays the player’s current XP balance (numeric) in a prominent location.",
-        "Each item shows one of these states based on backend data: \"Buy\" (locked), \"Owned\" (unlocked).",
-        "If the user has insufficient XP, the UI prevents purchase and shows an English error message (e.g., \"Not enough XP\")."
+        "The track environment includes visible asphalt surface, grass off-track areas, and red/white curbing.",
+        "Trackside barriers/guardrails are present and visually consistent along the circuit.",
+        "Lighting and post effects (fog/sky) produce a more realistic outdoor track appearance than the current stylized arena-like ring."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Store.tsx",
+          "path": "frontend/src/components/race/RealisticRoadCourseScene.tsx",
+          "operation": "create",
+          "description": "Create a road-course environment component that renders an asphalt racing surface with grass verges, red/white curbs, and repeated guardrail/barrier segments, and exposes tunable parameters for outdoor lighting and fog to achieve a realistic look; load required textures from generated assets and apply appropriate tiling/roughness/normal usage where applicable. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
           "operation": "modify",
-          "description": "Implement the Store catalog grid listing the exact neon items and costs (red=100, blue=100, yellow=100, purple=100, orange=100, multicolor=1000, white=25). Display the current XP balance prominently and render each item state as \"Owned\" vs \"Buy\" based on fetched ownership data. Use shadcn-ui Card/Badge/Button for item tiles and state display; verify the component's usage instructions before implementing."
+          "description": "Replace the current ring/arena-like track visuals with RealisticRoadCourseScene, wiring it into the existing scene render path and ensuring fog/sky/lighting is configured for a realistic outdoor track appearance. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Ensure the player can drive the car with responsive keyboard controls and a stable third-person chase camera behind the car.",
+      "acceptanceCriteria": [
+        "Keyboard controls allow driving the car (accelerate/brake + steering) and the car’s position/rotation updates accordingly.",
+        "The camera follows behind the car in a chase view that keeps the car centered similarly to the reference screenshot while driving.",
+        "Driving remains playable without jitter (no extreme camera shaking or instability during normal driving)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/race/useCarControls.ts",
+          "operation": "create",
+          "description": "Add a focused hook that centralizes keyboard input state (accelerate/brake/left/right) and produces smooth control signals suitable for updating vehicle movement each frame. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/store/StoreItemCard.tsx",
+          "path": "frontend/src/components/race/useChaseCamera.ts",
           "operation": "create",
-          "description": "Add a reusable Store item card component that renders thumbnail, item name, XP cost, and stateful action (Buy/Owned/Disabled). Use shadcn-ui primitives for consistent UI; verify the component's usage instructions before implementing."
+          "description": "Add a hook for a stable third-person chase camera that follows behind the player car with configurable follow distance/height and smoothing, avoiding excessive shake/jitter while maintaining a rear-of-car perspective. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/store/storeCatalog.ts",
-          "operation": "create",
-          "description": "Define the Store catalog source-of-truth constants for the 7 neon items (names, costs, thumbnail image mapping) to guarantee the exact prices required by the user."
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Wire the new control and camera hooks into the existing per-frame simulation so the player car is drivable (accel/brake/steer) and the camera remains stable and centered in a chase view behind the car; reduce/disable existing random camera shake during normal driving to meet stability requirements. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Add collectible XP coins to the in-race 3D gameplay with rarity rules and one-time collection that credits XP automatically.",
+      "summary": "Add an in-race HUD overlay showing lap progress and current speed, positioned away from the center and readable over the 3D scene.",
       "acceptanceCriteria": [
-        "During a race, the player can collect XP coins and see their XP increase without needing to manually refresh.",
-        "1 XP and 5 XP coins appear in normal/on-track locations with noticeably higher frequency than 10/20 coins.",
-        "10 XP and 20 XP coins are not commonly visible on the main racing line; they are placed in hidden/off-line locations and/or appear after the stunt condition is met.",
-        "Coin collection cannot be repeated for the same coin instance (i.e., a collected coin is removed/marked collected)."
+        "During the race, UI displays lap progress (e.g., \"Lap 1/3\") and a speed value that changes as the car accelerates/brakes.",
+        "HUD elements are readable on top of the 3D scene and are placed away from the screen center."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/F1RaceTrack.tsx",
-          "operation": "modify",
-          "description": "Integrate XP coin spawning, rendering (3D sprites/planes), and collision-based collection into the existing 3D race loop. Ensure many 1/5 XP coins spawn in normal track areas, and 10/20 XP coins are placed off-line/hidden and/or gated by the stunt trigger. On collect: mark the coin instance as collected (removed/hidden) to prevent repeat collection, and invoke the backend coin-collection capability via React Query wiring so XP is credited immediately."
-        },
-        {
-          "path": "frontend/src/components/AIRaceTrack.tsx",
-          "operation": "modify",
-          "description": "Add the same XP coin spawning/rendering/collection behavior to AI race gameplay so coin pickup rules are consistent across race modes. Ensure collection removes/marks the coin instance and credits XP via the existing backend coin-collection capability through React Query wiring."
-        },
-        {
-          "path": "frontend/src/components/race/XPCoinTypes.ts",
+          "path": "frontend/src/components/race/RaceHUDOverlay.tsx",
           "operation": "create",
-          "description": "Create shared frontend types/helpers for XP coin values (1/5/10/20), their sprite image mapping, and any shared coin metadata needed by both race components."
-        },
-        {
-          "path": "frontend/src/components/race/RaceXPHUD.tsx",
-          "operation": "create",
-          "description": "Create a small in-race HUD element showing recent XP gains and/or current run XP pickups (neon-styled). Use shadcn-ui where appropriate (e.g., Badge) without editing immutable UI sources; verify the component's usage instructions before implementing."
+          "description": "Create a lightweight HUD overlay component (DOM overlay above the Canvas) that displays at minimum lap/total laps and a live speed readout, styled for readability and placed away from the screen center. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/F1RaceTrack.tsx",
           "operation": "modify",
-          "description": "Wire the new RaceXPHUD component into the F1 race UI overlay so players receive immediate visual feedback when collecting XP coins (without manual refresh)."
-        },
-        {
-          "path": "frontend/src/components/AIRaceTrack.tsx",
-          "operation": "modify",
-          "description": "Wire the new RaceXPHUD component into the AI race UI overlay for immediate XP pickup feedback (without manual refresh)."
+          "description": "Integrate RaceHUDOverlay into the race view so it receives the current lap/total laps and speed derived from the player car state, and ensure the overlay renders above the 3D scene without blocking the center. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-5",
-      "summary": "Implement an \"amazing stunt\" detection heuristic that gates high-value (10/20) coins with sensible cooldown.",
+      "summary": "Add required generated static textures/decals under frontend/public/assets/generated and load them directly from the frontend for car/track rendering.",
       "acceptanceCriteria": [
-        "There is an explicit, documented stunt trigger condition implemented in the race code (e.g., airtime + landing, speed + jump, sharp drift + speed, etc.) that can be reliably achieved in gameplay.",
-        "When the stunt triggers, at least one 10 XP or 20 XP coin becomes obtainable (e.g., spawned or revealed) during that race.",
-        "The stunt trigger does not fire continuously every frame; it has sensible gating/cooldown so it feels like an achievement."
+        "All newly introduced textures/decals are stored in frontend/public/assets/generated and loaded directly by the frontend (e.g., via THREE.TextureLoader).",
+        "The realistic car appearance (yellow + rear gradient accent) is achieved using these static assets and/or materials in the scene."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/F1RaceTrack.tsx",
-          "operation": "modify",
-          "description": "Add an explicit stunt heuristic using existing race telemetry available in this component (e.g., detect airtime above a Y-threshold for a minimum duration combined with sufficient speed, then confirm landing) and gate it with a cooldown. When triggered, reveal/spawn at least one 10 XP or 20 XP coin during the current race."
-        },
-        {
-          "path": "frontend/src/components/AIRaceTrack.tsx",
-          "operation": "modify",
-          "description": "Implement the same stunt trigger heuristic and cooldown logic for AI races, and reveal/spawn at least one 10/20 XP coin when the stunt condition triggers."
-        },
-        {
-          "path": "frontend/src/components/race/stuntDetection.ts",
+          "path": "frontend/public/assets/generated/sports-coupe-livery.dim_2048x1024.png",
           "operation": "create",
-          "description": "Create a shared stunt detection helper (documented in code comments) that consumes available telemetry (position/velocity/airtime/landing) and emits a gated \"stunt triggered\" signal usable by both race implementations."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Apply a cohesive neon-racing theme to the Store and new XP/coin HUD UI without editing immutable UI component sources.",
-      "acceptanceCriteria": [
-        "Store page has a consistent neon-inspired look (colors, spacing, typography, card styling) that is clearly differentiated from default styling.",
-        "New theme is applied consistently across Store list, XP balance display, and purchase states.",
-        "No edits are made to files under \"frontend/src/components/ui\" or any other immutable paths."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add neon-racing theme utility classes and/or CSS variables (scoped to Store and new race HUD elements) to create a consistent neon palette, glow accents, and typography treatment while leaving immutable UI component sources untouched."
+          "description": "Add the generated realistic sports coupe livery/texture asset (yellow body with rear rainbow/gradient band) at this exact path for direct loading by THREE.TextureLoader."
         },
         {
-          "path": "frontend/src/pages/Store.tsx",
-          "operation": "modify",
-          "description": "Apply the neon theme classes consistently across the Store page (header, XP balance, item cards, Buy/Owned states) without modifying any files under frontend/src/components/ui. Use shadcn-ui composition for structure; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/race/RaceXPHUD.tsx",
-          "operation": "modify",
-          "description": "Apply the same neon theme styling conventions to the XP coin HUD (colors, glow accents, spacing) for consistent visual language with the Store. Use shadcn-ui composition where helpful; verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Wire React Query queries/mutations for Store data and purchases, and ensure coin pickups trigger correct refetch/update behavior.",
-      "acceptanceCriteria": [
-        "Store page uses React Query to fetch the current XP and owned neon lights.",
-        "After purchasing an item, the Store UI updates to show the new XP total and the item as owned without requiring a hard refresh.",
-        "After collecting XP coins in a race, the player’s XP displayed in the Store is correct after navigating to the Store (and/or after a refetch)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add React Query hooks for Store: fetch XP + owned items (using existing backend capabilities like getStoreStatus/getFullStoreData/getMyOwnedItems as appropriate) and purchase mutation (purchaseItem). Ensure mutations invalidate/refetch Store queries on success and surface errors in English via toast."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add a React Query mutation hook for XP coin collection (using the existing backend coin-collection capability) that returns the updated XP and invalidates Store-related query keys so the Store balance is correct after pickups."
-        },
-        {
-          "path": "frontend/src/pages/Store.tsx",
-          "operation": "modify",
-          "description": "Use the new React Query Store hooks to render XP balance, ownership state, and handle purchases. Ensure insufficient XP prevents purchase in the UI and shows an English error message (e.g., \"Not enough XP\"). Use shadcn-ui for feedback and layout; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/F1RaceTrack.tsx",
-          "operation": "modify",
-          "description": "Call the React Query coin-collection mutation when a coin is collected and update local HUD immediately; ensure Store-related query keys are invalidated/refetched so Store XP is correct after returning to the Store."
-        },
-        {
-          "path": "frontend/src/components/AIRaceTrack.tsx",
-          "operation": "modify",
-          "description": "Call the React Query coin-collection mutation on coin pickup and update HUD immediately; ensure Store-related query keys are invalidated/refetched so Store XP is correct after returning to the Store."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Add and render generated Store neon thumbnails and XP coin visuals from static assets under frontend/public/assets/generated.",
-      "acceptanceCriteria": [
-        "All required images exist under \"frontend/public/assets/generated\" and are referenced via \"/assets/generated/...\" paths.",
-        "Store items display a thumbnail image for each neon light color.",
-        "XP coin pickups use coin images (or in-world sprites) that visually differentiate 1/5/10/20 values."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/neon-light-red.dim_256x256.png",
+          "path": "frontend/public/assets/generated/asphalt-realistic.dim_2048x2048.png",
           "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-red.dim_256x256.png."
+          "description": "Add the generated asphalt road texture asset at this exact path for direct loading by THREE.TextureLoader."
         },
         {
-          "path": "frontend/public/assets/generated/neon-light-blue.dim_256x256.png",
+          "path": "frontend/public/assets/generated/grass-verge.dim_2048x2048.png",
           "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-blue.dim_256x256.png."
+          "description": "Add the generated grass verge texture asset at this exact path for direct loading by THREE.TextureLoader."
         },
         {
-          "path": "frontend/public/assets/generated/neon-light-yellow.dim_256x256.png",
+          "path": "frontend/public/assets/generated/guardrail-texture.dim_2048x512.png",
           "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-yellow.dim_256x256.png."
+          "description": "Add the generated trackside barrier/guardrail texture asset at this exact path for direct loading by THREE.TextureLoader."
         },
         {
-          "path": "frontend/public/assets/generated/neon-light-purple.dim_256x256.png",
+          "path": "frontend/public/assets/generated/curb-red-white-realistic.dim_2048x256.png",
           "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-purple.dim_256x256.png."
+          "description": "Add the generated red/white curb texture asset at this exact path for direct loading by THREE.TextureLoader."
         },
         {
-          "path": "frontend/public/assets/generated/neon-light-orange.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-orange.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/neon-light-white.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-white.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/neon-light-multicolor.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated Store thumbnail asset at frontend/public/assets/generated/neon-light-multicolor.dim_256x256.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/xp-coin-1.dim_128x128.png",
-          "operation": "create",
-          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-1.dim_128x128.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/xp-coin-5.dim_128x128.png",
-          "operation": "create",
-          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-5.dim_128x128.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/xp-coin-10.dim_128x128.png",
-          "operation": "create",
-          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-10.dim_128x128.png."
-        },
-        {
-          "path": "frontend/public/assets/generated/xp-coin-20.dim_128x128.png",
-          "operation": "create",
-          "description": "Add the generated XP coin sprite at frontend/public/assets/generated/xp-coin-20.dim_128x128.png."
-        },
-        {
-          "path": "frontend/src/pages/Store.tsx",
+          "path": "frontend/src/components/race/RealisticSportsCoupeCar.tsx",
           "operation": "modify",
-          "description": "Render the neon light thumbnails for each Store item by referencing the exact static asset paths under frontend/public/assets/generated. Use shadcn-ui Card/Image composition; verify the component's usage instructions before implementing."
+          "description": "Wire the livery texture at frontend/public/assets/generated/sports-coupe-livery.dim_2048x1024.png into the player car material/UV usage to achieve the yellow base + rear gradient accent look. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "path": "frontend/src/components/race/RealisticRoadCourseScene.tsx",
           "operation": "modify",
-          "description": "Render XP coin pickups using the coin sprite images (frontend/public/assets/generated/xp-coin-1.dim_128x128.png, xp-coin-5.dim_128x128.png, xp-coin-10.dim_128x128.png, xp-coin-20.dim_128x128.png) so values are visually differentiated."
-        },
-        {
-          "path": "frontend/src/components/AIRaceTrack.tsx",
-          "operation": "modify",
-          "description": "Render XP coin pickups using the coin sprite images (frontend/public/assets/generated/xp-coin-1.dim_128x128.png, xp-coin-5.dim_128x128.png, xp-coin-10.dim_128x128.png, xp-coin-20.dim_128x128.png) so values are visually differentiated."
+          "description": "Wire the environment textures at frontend/public/assets/generated/asphalt-realistic.dim_2048x2048.png, frontend/public/assets/generated/grass-verge.dim_2048x2048.png, frontend/public/assets/generated/curb-red-white-realistic.dim_2048x256.png, and frontend/public/assets/generated/guardrail-texture.dim_2048x512.png into the track meshes/materials for asphalt/grass/curbs/guardrails. Verify the component's usage instructions before implementing."
         }
       ]
     }
