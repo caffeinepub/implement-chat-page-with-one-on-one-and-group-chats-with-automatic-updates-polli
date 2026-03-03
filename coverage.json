@@ -1,0 +1,45 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-03-01T14:25:11.930Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 1,
+    "implemented": 1,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Fix the race countdown/race timer so it runs at the correct real-time rate (1 second per second). The timer must not count down faster than wall-clock time, and the race must not end prematurely immediately after starting.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/SinglePlayerRace.tsx",
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/SinglePlayerRace.tsx",
+          "frontend/src/components/F1RaceTrack.tsx",
+          "frontend/src/components/AIRaceTrack.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/AIRace.tsx",
+    "frontend/src/components/AIRaceTrack.tsx",
+    "frontend/src/components/F1RaceTrack.tsx",
+    "frontend/src/components/Matchmaking.tsx",
+    "frontend/src/components/SinglePlayerRace.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

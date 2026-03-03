@@ -1,0 +1,38 @@
+{
+  "kind": "build_request",
+  "title": "Fix race timer running too fast",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Fix the race countdown/race timer so it runs at the correct real-time rate (1 second per second). The timer must not count down faster than wall-clock time, and the race must not end prematurely immediately after starting.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "the time is too fast when i start racing it finishes"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When a race starts, the timer decrements at exactly 1 second per second of real elapsed time.",
+        "A race with a 60-second limit does not end before approximately 60 real seconds have passed.",
+        "The race does not finish immediately or within a few seconds of starting.",
+        "The fix applies to both single-player and time challenge modes."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not change race logic, lap counting, or scoring — only fix the timer tick rate."
+  ],
+  "nonGoals": [
+    "Adding new timer UI or timer display changes.",
+    "Modifying backend race completion logic.",
+    "Changing any other gameplay mechanics."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

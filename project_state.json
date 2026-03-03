@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Racing game with track customization and time challenge mode. User reported the timer runs too fast, causing races to finish immediately.",
+  "architectural_notes": [],
+  "known_issues": [
+    "Timer runs too fast in time challenge mode — race finishes immediately after starting"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-fix-the-race-countdown-race-timer-so-it-runs-at-the-correct-real-time-rate-1-second-per-second-the-timer-must-not-count-down-faster-than-wall-clock-time-and-the-race-must-not-end-prematurely-immediately-after-starting",
+      "title": "Fix the race countdown/race timer so it runs at the correct real-time rate (1 second per second). The timer must not count down faster than wall-clock time, and the race must not end prematurely immediately after starting.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [],
+  "gameProjectType": "2d",
+  "projectName": "Fix race timer running too fast",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

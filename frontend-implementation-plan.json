@@ -1,0 +1,34 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix race timer running too fast",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Fix the race countdown/race timer to run at the correct real-time rate (1 second per second)",
+      "acceptanceCriteria": [
+        "When a race starts, the timer decrements at exactly 1 second per second of real elapsed time.",
+        "A race with a 60-second limit does not end before approximately 60 real seconds have passed.",
+        "The race does not finish immediately or within a few seconds of starting.",
+        "The fix applies to both single-player and time challenge modes."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/SinglePlayerRace.tsx",
+          "operation": "modify",
+          "description": "Fix the race timer tick rate in the single-player race component. Replace any frame-based countdown (e.g., decrementing every render frame) with a proper time-based implementation using Date.now() or performance.now() to track elapsed real-world seconds. Ensure the countdown decrements by calculating the difference between the current timestamp and the race start timestamp, not by decrementing on every animation frame. The timer must respect wall-clock time so that 60 seconds of game time equals 60 seconds of real time."
+        },
+        {
+          "path": "frontend/src/components/F1RaceTrack.tsx",
+          "operation": "modify",
+          "description": "Fix the race timer tick rate in the multiplayer F1 race track component. Replace any frame-based countdown with a time-based implementation using Date.now() or performance.now() to track elapsed real-world seconds. Ensure the countdown logic calculates remaining time based on the difference between the current timestamp and race start timestamp, not by decrementing a counter every frame. Apply the same fix pattern used in SinglePlayerRace.tsx to maintain consistency across race modes."
+        },
+        {
+          "path": "frontend/src/components/AIRaceTrack.tsx",
+          "operation": "modify",
+          "description": "Fix the race timer tick rate in the AI race track component. Replace any frame-based countdown with a time-based implementation using Date.now() or performance.now() to track elapsed real-world seconds. Ensure the timer logic respects wall-clock time and does not complete races prematurely. Apply the same fix pattern used in the other race components to ensure consistent timer behavior across all race modes."
+        }
+      ]
+    }
+  ]
+}
