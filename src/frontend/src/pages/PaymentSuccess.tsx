@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { CheckCircle, Loader2 } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useNavigate } from "@tanstack/react-router";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -13,7 +19,7 @@ export default function PaymentSuccess() {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          navigate({ to: '/' });
+          navigate({ to: "/" });
           return 0;
         }
         return prev - 1;
@@ -38,7 +44,8 @@ export default function PaymentSuccess() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <p className="text-muted-foreground">
-              Your subscription has been activated successfully. You now have access to all premium features!
+              Your subscription has been activated successfully. You now have
+              access to all premium features!
             </p>
             <div className="p-4 bg-primary/10 rounded-lg mt-4">
               <p className="text-sm font-medium">Premium Features Unlocked:</p>
@@ -52,7 +59,11 @@ export default function PaymentSuccess() {
           </div>
 
           <div className="space-y-3">
-            <Button className="w-full" size="lg" onClick={() => navigate({ to: '/' })}>
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={() => navigate({ to: "/" })}
+            >
               Start Racing Now
             </Button>
             <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">

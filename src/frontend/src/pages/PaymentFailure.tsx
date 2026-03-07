@@ -1,7 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { XCircle } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useNavigate } from "@tanstack/react-router";
+import { XCircle } from "lucide-react";
 
 export default function PaymentFailure() {
   const navigate = useNavigate();
@@ -21,25 +27,31 @@ export default function PaymentFailure() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <p className="text-muted-foreground">
-              No charges were made to your account. You can try again whenever you're ready.
+              No charges were made to your account. You can try again whenever
+              you're ready.
             </p>
             <div className="p-4 bg-muted rounded-lg mt-4">
               <p className="text-sm font-medium">Need help?</p>
               <p className="text-sm text-muted-foreground mt-1">
-                If you experienced any issues during checkout, please contact our support team.
+                If you experienced any issues during checkout, please contact
+                our support team.
               </p>
             </div>
           </div>
 
           <div className="space-y-3">
-            <Button className="w-full" size="lg" onClick={() => navigate({ to: '/plans' })}>
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={() => navigate({ to: "/plans" })}
+            >
               View Plans Again
             </Button>
             <Button
               className="w-full"
               size="lg"
               variant="outline"
-              onClick={() => navigate({ to: '/' })}
+              onClick={() => navigate({ to: "/" })}
             >
               Return to Home
             </Button>

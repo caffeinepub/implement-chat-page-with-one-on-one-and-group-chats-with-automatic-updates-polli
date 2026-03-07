@@ -1,23 +1,44 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { useGetGlobalLeaderboard, useGetFriendsLeaderboard } from '../hooks/useQueries';
-import { Trophy, Users, Globe, Crown } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Crown, Globe, Trophy, Users } from "lucide-react";
+import { useState } from "react";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import {
+  useGetFriendsLeaderboard,
+  useGetGlobalLeaderboard,
+} from "../hooks/useQueries";
 
 export default function Leaderboards() {
   const [season] = useState<number>(1);
   const { identity } = useInternetIdentity();
-  
-  const { data: globalLeaderboard, isLoading: globalLoading } = useGetGlobalLeaderboard(season);
-  const { data: friendsLeaderboard, isLoading: friendsLoading } = useGetFriendsLeaderboard(season);
+
+  const { data: globalLeaderboard, isLoading: globalLoading } =
+    useGetGlobalLeaderboard(season);
+  const { data: friendsLeaderboard, isLoading: friendsLoading } =
+    useGetFriendsLeaderboard(season);
 
   const currentPrincipal = identity?.getPrincipal().toString();
 
-  const renderLeaderboardTable = (entries: any[] | null | undefined, isLoading: boolean) => {
+  const renderLeaderboardTable = (
+    entries: any[] | null | undefined,
+    isLoading: boolean,
+  ) => {
     if (isLoading) {
       return (
         <div className="space-y-2">
@@ -32,7 +53,9 @@ export default function Leaderboards() {
       return (
         <div className="text-center py-12">
           <Trophy className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground">No leaderboard data available yet</p>
+          <p className="text-muted-foreground">
+            No leaderboard data available yet
+          </p>
         </div>
       );
     }
@@ -50,24 +73,34 @@ export default function Leaderboards() {
           {entries.map((entry, index) => {
             const isCurrentUser = entry.player.toString() === currentPrincipal;
             return (
-              <TableRow key={entry.player.toString()} className={isCurrentUser ? 'bg-primary/10' : ''}>
+              <TableRow
+                key={entry.player.toString()}
+                className={isCurrentUser ? "bg-primary/10" : ""}
+              >
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
-                    {index === 0 && <Crown className="h-4 w-4 text-yellow-500" />}
+                    {index === 0 && (
+                      <Crown className="h-4 w-4 text-yellow-500" />
+                    )}
                     {index === 1 && <Crown className="h-4 w-4 text-gray-400" />}
-                    {index === 2 && <Crown className="h-4 w-4 text-amber-700" />}
+                    {index === 2 && (
+                      <Crown className="h-4 w-4 text-amber-700" />
+                    )}
                     <span>{index + 1}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs truncate max-w-[200px]">
-                      {entry.player.toString().slice(0, 8)}...{entry.player.toString().slice(-6)}
+                      {entry.player.toString().slice(0, 8)}...
+                      {entry.player.toString().slice(-6)}
                     </span>
                     {isCurrentUser && <Badge variant="default">You</Badge>}
                   </div>
                 </TableCell>
-                <TableCell className="text-right font-bold">{entry.skill.toString()}</TableCell>
+                <TableCell className="text-right font-bold">
+                  {entry.skill.toString()}
+                </TableCell>
               </TableRow>
             );
           })}
@@ -110,7 +143,9 @@ export default function Leaderboards() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Global Rankings</CardTitle>
-                  <CardDescription>Top players from around the world</CardDescription>
+                  <CardDescription>
+                    Top players from around the world
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {renderLeaderboardTable(globalLeaderboard, globalLoading)}

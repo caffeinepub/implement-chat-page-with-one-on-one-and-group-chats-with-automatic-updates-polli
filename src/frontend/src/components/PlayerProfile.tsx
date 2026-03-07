@@ -1,15 +1,34 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { useGetCallerUserProfile, useGetMyRaceStats, useGetMyFriends } from '../hooks/useQueries';
-import { User, Trophy, Target, Users, TrendingUp, Clock, Zap } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import FriendsManager from './FriendsManager';
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Clock,
+  Target,
+  TrendingUp,
+  Trophy,
+  User,
+  Users,
+  Zap,
+} from "lucide-react";
+import {
+  useGetCallerUserProfile,
+  useGetMyFriends,
+  useGetMyRaceStats,
+} from "../hooks/useQueries";
+import FriendsManager from "./FriendsManager";
 
 export default function PlayerProfile() {
-  const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
+  const { data: userProfile, isLoading: profileLoading } =
+    useGetCallerUserProfile();
   const { data: raceStats, isLoading: statsLoading } = useGetMyRaceStats();
-  const { data: friends, isLoading: friendsLoading } = useGetMyFriends();
+  const { data: friends, isLoading: _friendsLoading } = useGetMyFriends();
 
   if (profileLoading || statsLoading) {
     return (
@@ -33,13 +52,14 @@ export default function PlayerProfile() {
   const totalRaces = Number(userProfile.totalRaces);
   const wins = raceStats ? Number(raceStats.wins) : 0;
   const losses = raceStats ? Number(raceStats.losses) : 0;
-  const winRate = totalRaces > 0 ? ((wins / totalRaces) * 100).toFixed(1) : '0.0';
+  const winRate =
+    totalRaces > 0 ? ((wins / totalRaces) * 100).toFixed(1) : "0.0";
   const srLevel = Number(userProfile.srLevel);
 
   const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
     const milliseconds = Math.floor((ms % 1000) / 10);
-    return `${seconds}.${milliseconds.toString().padStart(2, '0')}s`;
+    return `${seconds}.${milliseconds.toString().padStart(2, "0")}s`;
   };
 
   return (
@@ -54,7 +74,9 @@ export default function PlayerProfile() {
               </div>
               <div>
                 <CardTitle className="text-2xl">{userProfile.name}</CardTitle>
-                <CardDescription className="text-base">Professional Racer</CardDescription>
+                <CardDescription className="text-base">
+                  Professional Racer
+                </CardDescription>
               </div>
             </div>
             <div className="flex flex-col gap-2 items-end">
@@ -124,7 +146,9 @@ export default function PlayerProfile() {
               <div>
                 <p className="text-sm text-muted-foreground">Best Time</p>
                 <p className="text-2xl font-bold text-yellow-500">
-                  {raceStats && raceStats.bestTime > 0 ? formatTime(Number(raceStats.bestTime)) : '--'}
+                  {raceStats && raceStats.bestTime > 0
+                    ? formatTime(Number(raceStats.bestTime))
+                    : "--"}
                 </p>
               </div>
             </div>
@@ -151,7 +175,9 @@ export default function PlayerProfile() {
           <Separator />
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Skill Rating</span>
-            <Badge variant="default">{userProfile.skillRating.toString()}</Badge>
+            <Badge variant="default">
+              {userProfile.skillRating.toString()}
+            </Badge>
           </div>
           <Separator />
           <div className="flex justify-between items-center">

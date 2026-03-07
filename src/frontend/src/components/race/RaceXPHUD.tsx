@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Coins, Zap } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Coins, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface XPGain {
   id: string;
@@ -34,8 +34,7 @@ export default function RaceXPHUD({ currentXP, recentGains }: RaceXPHUDProps) {
             className="animate-in slide-in-from-right fade-in duration-300"
           >
             <Badge className="neon-badge bg-neon-accent/20 backdrop-blur-sm px-3 py-1">
-              <Zap className="h-3 w-3 mr-1" />
-              +{gain.amount} XP
+              <Zap className="h-3 w-3 mr-1" />+{gain.amount} XP
             </Badge>
           </div>
         ))}

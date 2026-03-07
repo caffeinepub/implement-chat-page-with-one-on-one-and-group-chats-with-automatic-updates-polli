@@ -33,7 +33,7 @@ export function createStuntDetector(): StuntState {
 export function detectStunt(
   state: StuntState,
   telemetry: StuntTelemetry,
-  currentTime: number
+  currentTime: number,
 ): boolean {
   const { positionY, isGrounded, speed } = telemetry;
 
@@ -58,7 +58,10 @@ export function detectStunt(
     state.isAirborne = false;
 
     // Check if airtime and height meet stunt requirements
-    if (airtime >= STUNT_CONFIG.MIN_AIRTIME && height >= STUNT_CONFIG.MIN_HEIGHT) {
+    if (
+      airtime >= STUNT_CONFIG.MIN_AIRTIME &&
+      height >= STUNT_CONFIG.MIN_HEIGHT
+    ) {
       state.lastStuntTime = currentTime;
       return true;
     }
@@ -67,11 +70,17 @@ export function detectStunt(
   return false;
 }
 
-export function isStuntCooldownActive(state: StuntState, currentTime: number): boolean {
+export function isStuntCooldownActive(
+  state: StuntState,
+  currentTime: number,
+): boolean {
   return currentTime - state.lastStuntTime < state.stuntCooldown;
 }
 
-export function getStuntCooldownRemaining(state: StuntState, currentTime: number): number {
+export function getStuntCooldownRemaining(
+  state: StuntState,
+  currentTime: number,
+): number {
   const remaining = state.stuntCooldown - (currentTime - state.lastStuntTime);
   return Math.max(0, remaining);
 }

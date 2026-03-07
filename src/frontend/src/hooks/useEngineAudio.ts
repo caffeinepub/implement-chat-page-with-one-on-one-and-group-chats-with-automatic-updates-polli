@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface EngineAudioControls {
   start: () => void;
@@ -29,17 +29,19 @@ export function useEngineAudio(): EngineAudioControls {
     if (isRunning) return;
 
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
       audioContextRef.current = audioContext;
 
       // Main oscillator for engine tone
       const oscillator = audioContext.createOscillator();
-      oscillator.type = 'sawtooth';
+      oscillator.type = "sawtooth";
       oscillator.frequency.value = 80; // Base engine frequency
 
       // Filter for engine character
       const filter = audioContext.createBiquadFilter();
-      filter.type = 'lowpass';
+      filter.type = "lowpass";
       filter.frequency.value = 800;
       filter.Q.value = 1;
 
@@ -49,7 +51,11 @@ export function useEngineAudio(): EngineAudioControls {
 
       // Noise for texture
       const bufferSize = 4096;
-      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const noiseBuffer = audioContext.createBuffer(
+        1,
+        bufferSize,
+        audioContext.sampleRate,
+      );
       const output = noiseBuffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1;
@@ -77,7 +83,7 @@ export function useEngineAudio(): EngineAudioControls {
       noiseGainRef.current = noiseGain;
       setIsRunning(true);
     } catch (error) {
-      console.error('Failed to start engine audio:', error);
+      console.error("Failed to start engine audio:", error);
     }
   };
 
@@ -85,7 +91,7 @@ export function useEngineAudio(): EngineAudioControls {
     if (oscillatorRef.current) {
       try {
         oscillatorRef.current.stop();
-      } catch (e) {
+      } catch (_e) {
         // Already stopped
       }
       oscillatorRef.current = null;

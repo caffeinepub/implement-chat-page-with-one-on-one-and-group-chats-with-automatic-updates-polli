@@ -56,8 +56,10 @@ module {
       },
       {
         name = "content-type";
-        value = if (method == #get) { "application/json" } else { "application/x-www-form-urlencoded" };
-      }
+        value = if (method == #get) { "application/json" } else {
+          "application/x-www-form-urlencoded";
+        };
+      },
     ];
     let url = "https://api.stripe.com/" # endpoint;
     switch (method) {

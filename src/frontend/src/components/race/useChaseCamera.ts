@@ -1,6 +1,6 @@
-import { useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
+import * as THREE from "three";
 
 interface ChaseCameraOptions {
   followDistance?: number;
@@ -13,7 +13,7 @@ export function useChaseCamera(
   targetPosition: THREE.Vector3,
   targetRotation: number,
   velocity: number,
-  options: ChaseCameraOptions = {}
+  options: ChaseCameraOptions = {},
 ) {
   const {
     followDistance = 12,
@@ -26,7 +26,7 @@ export function useChaseCamera(
   const cameraVelocity = useRef(new THREE.Vector3());
   const currentLookAt = useRef(new THREE.Vector3());
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     const speed = Math.abs(velocity);
     const dynamicDistance = followDistance + (speed / 80) * 3;
     const dynamicHeight = followHeight + (speed / 80) * 1.5;
@@ -34,19 +34,19 @@ export function useChaseCamera(
     const targetCameraPos = new THREE.Vector3(
       targetPosition.x - Math.sin(targetRotation) * dynamicDistance,
       targetPosition.y + dynamicHeight,
-      targetPosition.z - Math.cos(targetRotation) * dynamicDistance
+      targetPosition.z - Math.cos(targetRotation) * dynamicDistance,
     );
 
     cameraVelocity.current.lerp(
       targetCameraPos.clone().sub(camera.position),
-      smoothing
+      smoothing,
     );
     camera.position.add(cameraVelocity.current.multiplyScalar(delta * 8));
 
     const lookAtTarget = new THREE.Vector3(
       targetPosition.x + Math.sin(targetRotation) * lookAhead,
       targetPosition.y + 1,
-      targetPosition.z + Math.cos(targetRotation) * lookAhead
+      targetPosition.z + Math.cos(targetRotation) * lookAhead,
     );
 
     currentLookAt.current.lerp(lookAtTarget, smoothing * 1.5);

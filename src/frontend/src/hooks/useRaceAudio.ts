@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface UseRaceAudioOptions {
   autoPlay?: boolean;
@@ -19,10 +19,10 @@ interface RaceAudioControls {
 
 export function useRaceAudio(
   audioSrc: string,
-  options: UseRaceAudioOptions = {}
+  options: UseRaceAudioOptions = {},
 ): RaceAudioControls {
   const { autoPlay = false, loop = true, initialVolume = 0.5 } = options;
-  
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(initialVolume);
@@ -40,30 +40,30 @@ export function useRaceAudio(
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => setIsPlaying(false);
 
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
 
     // Auto play if enabled
     if (autoPlay) {
-      audio.play().catch(err => {
-        console.warn('Auto-play prevented by browser:', err);
+      audio.play().catch((err) => {
+        console.warn("Auto-play prevented by browser:", err);
       });
     }
 
     return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
       audio.pause();
-      audio.src = '';
+      audio.src = "";
     };
   }, [audioSrc, loop, initialVolume, autoPlay]);
 
   const play = () => {
     if (audioRef.current) {
-      audioRef.current.play().catch(err => {
-        console.error('Failed to play audio:', err);
+      audioRef.current.play().catch((err) => {
+        console.error("Failed to play audio:", err);
       });
     }
   };

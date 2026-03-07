@@ -1,11 +1,17 @@
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Coins, Loader2 } from 'lucide-react';
-import { useGetStoreStatus, usePurchaseItem } from '../hooks/useQueries';
-import { storeCatalog } from '../components/store/storeCatalog';
-import StoreItemCard from '../components/store/StoreItemCard';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, Coins, Loader2 } from "lucide-react";
+import StoreItemCard from "../components/store/StoreItemCard";
+import { storeCatalog } from "../components/store/storeCatalog";
+import { useGetStoreStatus, usePurchaseItem } from "../hooks/useQueries";
 
 export default function Store() {
   const navigate = useNavigate();
@@ -14,7 +20,7 @@ export default function Store() {
 
   const handlePurchase = async (itemName: string, cost: number) => {
     if (!storeStatus) return;
-    
+
     if (storeStatus.balance < BigInt(cost)) {
       return;
     }
@@ -22,7 +28,7 @@ export default function Store() {
     try {
       await purchaseItem.mutateAsync(itemName);
     } catch (error) {
-      console.error('Purchase failed:', error);
+      console.error("Purchase failed:", error);
     }
   };
 
@@ -42,7 +48,7 @@ export default function Store() {
       <div className="mb-8">
         <Button
           variant="ghost"
-          onClick={() => navigate({ to: '/' })}
+          onClick={() => navigate({ to: "/" })}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -81,19 +87,27 @@ export default function Store() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-4">
               <div className="flex items-center gap-3">
-                <Badge variant="outline" className="neon-badge">1 XP</Badge>
+                <Badge variant="outline" className="neon-badge">
+                  1 XP
+                </Badge>
                 <p className="text-sm">Common coins on track</p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="outline" className="neon-badge">5 XP</Badge>
+                <Badge variant="outline" className="neon-badge">
+                  5 XP
+                </Badge>
                 <p className="text-sm">Hidden track locations</p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="outline" className="neon-badge">10 XP</Badge>
+                <Badge variant="outline" className="neon-badge">
+                  10 XP
+                </Badge>
                 <p className="text-sm">After amazing stunts</p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="outline" className="neon-badge">20 XP</Badge>
+                <Badge variant="outline" className="neon-badge">
+                  20 XP
+                </Badge>
                 <p className="text-sm">Rare stunt rewards</p>
               </div>
             </div>

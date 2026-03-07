@@ -1,8 +1,8 @@
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Trophy, Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { Moon, Sun, Trophy } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 
 export default function Header() {
   const { login, clear, loginStatus, identity } = useInternetIdentity();
@@ -10,8 +10,13 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
 
   const isAuthenticated = !!identity;
-  const disabled = loginStatus === 'logging-in';
-  const text = loginStatus === 'logging-in' ? 'Logging in...' : isAuthenticated ? 'Logout' : 'Login';
+  const disabled = loginStatus === "logging-in";
+  const text =
+    loginStatus === "logging-in"
+      ? "Logging in..."
+      : isAuthenticated
+        ? "Logout"
+        : "Login";
 
   const handleAuth = async () => {
     if (isAuthenticated) {
@@ -21,8 +26,8 @@ export default function Header() {
       try {
         await login();
       } catch (error: any) {
-        console.error('Login error:', error);
-        if (error.message === 'User is already authenticated') {
+        console.error("Login error:", error);
+        if (error.message === "User is already authenticated") {
           await clear();
           setTimeout(() => login(), 300);
         }
@@ -31,7 +36,7 @@ export default function Header() {
   };
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -43,9 +48,17 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
           </Button>
-          <Button onClick={handleAuth} disabled={disabled} variant={isAuthenticated ? 'outline' : 'default'}>
+          <Button
+            onClick={handleAuth}
+            disabled={disabled}
+            variant={isAuthenticated ? "outline" : "default"}
+          >
             {text}
           </Button>
         </div>

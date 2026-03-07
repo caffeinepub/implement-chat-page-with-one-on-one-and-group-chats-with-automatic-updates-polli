@@ -1,26 +1,37 @@
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile } from './hooks/useQueries';
-import { Loader2 } from 'lucide-react';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import ProfileSetupModal from './components/ProfileSetupModal';
-import MainMenu from './pages/MainMenu';
-import Store from './pages/Store';
-import PaymentSuccess from './pages/PaymentSuccess';
-import PaymentFailure from './pages/PaymentFailure';
-import Chat from './pages/Chat';
-import { ThemeProvider } from 'next-themes';
-import { Toaster } from '@/components/ui/sonner';
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { Toaster } from "@/components/ui/sonner";
+import {
+  Outlet,
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { ThemeProvider } from "next-themes";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import ProfileSetupModal from "./components/ProfileSetupModal";
+import SinglePlayerRace from "./components/SinglePlayerRace";
+import { useInternetIdentity } from "./hooks/useInternetIdentity";
+import { useGetCallerUserProfile } from "./hooks/useQueries";
+import MainMenu from "./pages/MainMenu";
+import PaymentFailure from "./pages/PaymentFailure";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import Store from "./pages/Store";
 
 function RootComponent() {
   const { identity, loginStatus } = useInternetIdentity();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    isFetched,
+  } = useGetCallerUserProfile();
 
   const isAuthenticated = !!identity;
-  const isInitializing = loginStatus === 'initializing';
+  const isInitializing = loginStatus === "initializing";
 
-  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+  const showProfileSetup =
+    isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
   if (isInitializing) {
     return (
@@ -37,7 +48,9 @@ function RootComponent() {
         {!isAuthenticated ? (
           <div className="container mx-auto flex min-h-[calc(100vh-8rem)] items-center justify-center px-4">
             <div className="text-center">
-              <h1 className="mb-4 text-4xl font-bold text-foreground">Welcome to Racing Arena</h1>
+              <h1 className="mb-4 text-4xl font-bold text-foreground">
+                Welcome to Racing Arena
+              </h1>
               <p className="mb-8 text-lg text-muted-foreground">
                 Please log in to start racing and compete on the leaderboards
               </p>
@@ -61,35 +74,41 @@ const rootRoute = createRootRoute({
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: MainMenu,
 });
 
 const storeRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/store',
+  path: "/store",
   component: Store,
-});
-
-const chatRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/chat',
-  component: Chat,
 });
 
 const paymentSuccessRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/payment-success',
+  path: "/payment-success",
   component: PaymentSuccess,
 });
 
 const paymentFailureRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/payment-failure',
+  path: "/payment-failure",
   component: PaymentFailure,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, storeRoute, chatRoute, paymentSuccessRoute, paymentFailureRoute]);
+const singlePlayerRaceRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/single-player-race",
+  component: SinglePlayerRace,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  storeRoute,
+  paymentSuccessRoute,
+  paymentFailureRoute,
+  singlePlayerRaceRoute,
+]);
 
 const router = createRouter({ routeTree });
 

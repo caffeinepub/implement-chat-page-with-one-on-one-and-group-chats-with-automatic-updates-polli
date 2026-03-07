@@ -1,21 +1,45 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGetGroups, useCreateGroup, useJoinGroup } from '../hooks/useQueries';
-import { Users, Plus, Trophy, Flag, Loader2 } from 'lucide-react';
-import { GroupType } from '../backend';
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Flag, Loader2, Plus, Trophy, Users } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { GroupType } from "../backend";
+import {
+  useCreateGroup,
+  useGetGroups,
+  useJoinGroup,
+} from "../hooks/useQueries";
 
 export default function Groups() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [groupName, setGroupName] = useState('');
+  const [groupName, setGroupName] = useState("");
   const [groupType, setGroupType] = useState<GroupType>(GroupType.race);
-  const [maxCapacity, setMaxCapacity] = useState('4');
+  const [maxCapacity, setMaxCapacity] = useState("4");
 
   const { data: groups, isLoading } = useGetGroups();
   const createGroup = useCreateGroup();
@@ -23,13 +47,13 @@ export default function Groups() {
 
   const handleCreateGroup = async () => {
     if (!groupName.trim()) {
-      toast.error('Please enter a group name');
+      toast.error("Please enter a group name");
       return;
     }
 
-    const capacity = parseInt(maxCapacity);
-    if (isNaN(capacity) || capacity < 2 || capacity > 20) {
-      toast.error('Player count must be between 2 and 20');
+    const capacity = Number.parseInt(maxCapacity);
+    if (Number.isNaN(capacity) || capacity < 2 || capacity > 20) {
+      toast.error("Player count must be between 2 and 20");
       return;
     }
 
@@ -38,16 +62,16 @@ export default function Groups() {
         name: groupName,
         groupType,
         maxCapacity: BigInt(capacity),
-        trackId: 'f1Track',
+        trackId: "f1Track",
       },
       {
         onSuccess: () => {
           setIsCreateDialogOpen(false);
-          setGroupName('');
-          setMaxCapacity('4');
+          setGroupName("");
+          setMaxCapacity("4");
           setGroupType(GroupType.race);
         },
-      }
+      },
     );
   };
 
@@ -73,9 +97,14 @@ export default function Groups() {
                 <Users className="h-5 w-5 text-primary" />
                 Racing Groups
               </CardTitle>
-              <CardDescription>Browse and join racing groups or create your own</CardDescription>
+              <CardDescription>
+                Browse and join racing groups or create your own
+              </CardDescription>
             </div>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <Dialog
+              open={isCreateDialogOpen}
+              onOpenChange={setIsCreateDialogOpen}
+            >
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
@@ -103,7 +132,9 @@ export default function Groups() {
                     <Label htmlFor="groupType">Mode</Label>
                     <Select
                       value={groupType}
-                      onValueChange={(value) => setGroupType(value as GroupType)}
+                      onValueChange={(value) =>
+                        setGroupType(value as GroupType)
+                      }
                     >
                       <SelectTrigger id="groupType">
                         <SelectValue />
@@ -135,15 +166,25 @@ export default function Groups() {
                       value={maxCapacity}
                       onChange={(e) => setMaxCapacity(e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">Between 2 and 20 players</p>
+                    <p className="text-xs text-muted-foreground">
+                      Between 2 and 20 players
+                    </p>
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                  >
                     Cancel
                   </Button>
-                  <Button onClick={handleCreateGroup} disabled={createGroup.isPending}>
-                    {createGroup.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button
+                    onClick={handleCreateGroup}
+                    disabled={createGroup.isPending}
+                  >
+                    {createGroup.isPending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Create Group
                   </Button>
                 </DialogFooter>
@@ -170,17 +211,30 @@ export default function Groups() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => {
-            const isFull = Number(group.memberCount) >= Number(group.maxCapacity);
-            const fillPercentage = (Number(group.memberCount) / Number(group.maxCapacity)) * 100;
+            const isFull =
+              Number(group.memberCount) >= Number(group.maxCapacity);
+            const fillPercentage =
+              (Number(group.memberCount) / Number(group.maxCapacity)) * 100;
 
             return (
-              <Card key={group.name} className="hover:border-primary transition-colors">
+              <Card
+                key={group.name}
+                className="hover:border-primary transition-colors"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{group.name}</CardTitle>
+                      <CardTitle className="text-lg mb-2">
+                        {group.name}
+                      </CardTitle>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant={group.groupType === GroupType.race ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={
+                            group.groupType === GroupType.race
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
                           {group.groupType === GroupType.race ? (
                             <>
                               <Flag className="h-3 w-3 mr-1" />
@@ -193,8 +247,9 @@ export default function Groups() {
                             </>
                           )}
                         </Badge>
-                        <Badge variant={isFull ? 'destructive' : 'outline'}>
-                          {Number(group.memberCount)}/{Number(group.maxCapacity)} Players
+                        <Badge variant={isFull ? "destructive" : "outline"}>
+                          {Number(group.memberCount)}/
+                          {Number(group.maxCapacity)} Players
                         </Badge>
                       </div>
                     </div>
@@ -204,7 +259,9 @@ export default function Groups() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Capacity</span>
-                      <span className="font-medium">{fillPercentage.toFixed(0)}%</span>
+                      <span className="font-medium">
+                        {fillPercentage.toFixed(0)}%
+                      </span>
                     </div>
                     <div className="h-2 bg-secondary rounded-full overflow-hidden">
                       <div
@@ -225,7 +282,7 @@ export default function Groups() {
                         Joining...
                       </>
                     ) : isFull ? (
-                      'Full'
+                      "Full"
                     ) : (
                       <>
                         <Users className="mr-2 h-4 w-4" />
@@ -263,7 +320,10 @@ export default function Groups() {
             <Users className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-foreground">Group Racing</p>
-              <p>Create private groups or join public ones to race with specific players</p>
+              <p>
+                Create private groups or join public ones to race with specific
+                players
+              </p>
             </div>
           </div>
         </CardContent>

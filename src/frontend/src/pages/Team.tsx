@@ -1,57 +1,85 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGetTeamRoster, useJoinTeam, useChangeRole, useLeaveTeam, useGetCallerUserProfile } from '../hooks/useQueries';
-import { Loader2, UserPlus, LogOut } from 'lucide-react';
-import { TeamRole } from '../backend';
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, LogOut, UserPlus } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { TeamRole } from "../backend";
+import {
+  useChangeRole,
+  useGetCallerUserProfile,
+  useGetTeamRoster,
+  useJoinTeam,
+  useLeaveTeam,
+} from "../hooks/useQueries";
 
 const careerRoles = [
   {
     role: TeamRole.driver,
-    name: 'Driver',
-    icon: '/assets/generated/driver-steering-wheel-icon.dim_64x64.png',
-    color: 'bg-blue-500',
-    borderColor: 'border-blue-500',
-    description: 'Primary racer responsible for vehicle control and race performance',
+    name: "Driver",
+    icon: "/assets/generated/driver-steering-wheel-icon.dim_64x64.png",
+    color: "bg-blue-500",
+    borderColor: "border-blue-500",
+    description:
+      "Primary racer responsible for vehicle control and race performance",
     responsibilities: [
-      'Control the F1 car during races',
-      'Execute optimal racing lines and overtaking maneuvers',
-      'Communicate track conditions to the team',
-      'Achieve fastest lap times and race victories',
+      "Control the F1 car during races",
+      "Execute optimal racing lines and overtaking maneuvers",
+      "Communicate track conditions to the team",
+      "Achieve fastest lap times and race victories",
     ],
   },
   {
     role: TeamRole.pitCrew,
-    name: 'Pit Crew',
-    icon: '/assets/generated/pit-crew-wrench-icon.dim_64x64.png',
-    color: 'bg-orange-500',
-    borderColor: 'border-orange-500',
-    description: 'Technical support managing vehicle maintenance and race strategy',
+    name: "Pit Crew",
+    icon: "/assets/generated/pit-crew-wrench-icon.dim_64x64.png",
+    color: "bg-orange-500",
+    borderColor: "border-orange-500",
+    description:
+      "Technical support managing vehicle maintenance and race strategy",
     responsibilities: [
-      'Monitor vehicle performance and telemetry',
-      'Plan pit stop timing and tire strategies',
-      'Provide technical feedback to drivers',
-      'Optimize car setup for track conditions',
+      "Monitor vehicle performance and telemetry",
+      "Plan pit stop timing and tire strategies",
+      "Provide technical feedback to drivers",
+      "Optimize car setup for track conditions",
     ],
   },
   {
     role: TeamRole.director,
-    name: 'Director',
-    icon: '/assets/generated/director-headset-icon.dim_64x64.png',
-    color: 'bg-purple-500',
-    borderColor: 'border-purple-500',
-    description: 'Team leader coordinating overall team strategy and decisions',
+    name: "Director",
+    icon: "/assets/generated/director-headset-icon.dim_64x64.png",
+    color: "bg-purple-500",
+    borderColor: "border-purple-500",
+    description: "Team leader coordinating overall team strategy and decisions",
     responsibilities: [
-      'Develop race strategy and tactics',
-      'Coordinate communication between team members',
-      'Make critical race-time decisions',
-      'Analyze competitor strategies and adapt',
+      "Develop race strategy and tactics",
+      "Coordinate communication between team members",
+      "Make critical race-time decisions",
+      "Analyze competitor strategies and adapt",
     ],
   },
 ];
@@ -59,7 +87,7 @@ const careerRoles = [
 export default function Team() {
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<TeamRole>(TeamRole.driver);
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState("");
 
   const { data: roster, isLoading } = useGetTeamRoster();
   const { data: userProfile } = useGetCallerUserProfile();
@@ -69,13 +97,13 @@ export default function Team() {
 
   const currentMember = roster
     ? [...roster.drivers, ...roster.pitCrew, ...roster.directors].find(
-        (member) => userProfile && member.name === userProfile.name
+        (member) => userProfile && member.name === userProfile.name,
       )
     : null;
 
   const handleJoinTeam = async () => {
     if (!playerName.trim()) {
-      toast.error('Please enter your name');
+      toast.error("Please enter your name");
       return;
     }
 
@@ -84,9 +112,9 @@ export default function Team() {
       {
         onSuccess: () => {
           setIsJoinDialogOpen(false);
-          setPlayerName('');
+          setPlayerName("");
         },
-      }
+      },
     );
   };
 
@@ -95,7 +123,7 @@ export default function Team() {
   };
 
   const handleLeaveTeam = () => {
-    if (confirm('Are you sure you want to leave the team?')) {
+    if (confirm("Are you sure you want to leave the team?")) {
       leaveTeam.mutate();
     }
   };
@@ -128,15 +156,29 @@ export default function Team() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">Full Throttle Team Careers</CardTitle>
-              <CardDescription>Choose your role and join the racing team</CardDescription>
+              <CardTitle className="text-2xl">
+                Full Throttle Team Careers
+              </CardTitle>
+              <CardDescription>
+                Choose your role and join the racing team
+              </CardDescription>
             </div>
             {currentMember ? (
               <div className="flex items-center gap-2">
-                <Badge className={careerRoles.find((r) => r.role === currentMember.role)?.color}>
+                <Badge
+                  className={
+                    careerRoles.find((r) => r.role === currentMember.role)
+                      ?.color
+                  }
+                >
                   {careerRoles.find((r) => r.role === currentMember.role)?.name}
                 </Badge>
-                <Button variant="outline" size="sm" onClick={handleLeaveTeam} disabled={leaveTeam.isPending}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLeaveTeam}
+                  disabled={leaveTeam.isPending}
+                >
                   {leaveTeam.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -148,7 +190,10 @@ export default function Team() {
                 </Button>
               </div>
             ) : (
-              <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
+              <Dialog
+                open={isJoinDialogOpen}
+                onOpenChange={setIsJoinDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button>
                     <UserPlus className="mr-2 h-4 w-4" />
@@ -158,7 +203,9 @@ export default function Team() {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Join the Team</DialogTitle>
-                    <DialogDescription>Select your career role and enter your name</DialogDescription>
+                    <DialogDescription>
+                      Select your career role and enter your name
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
@@ -172,7 +219,12 @@ export default function Team() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="role">Career Role</Label>
-                      <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as TeamRole)}>
+                      <Select
+                        value={selectedRole}
+                        onValueChange={(value) =>
+                          setSelectedRole(value as TeamRole)
+                        }
+                      >
                         <SelectTrigger id="role">
                           <SelectValue />
                         </SelectTrigger>
@@ -180,7 +232,11 @@ export default function Team() {
                           {careerRoles.map((career) => (
                             <SelectItem key={career.role} value={career.role}>
                               <div className="flex items-center gap-2">
-                                <img src={career.icon} alt={career.name} className="h-5 w-5" />
+                                <img
+                                  src={career.icon}
+                                  alt={career.name}
+                                  className="h-5 w-5"
+                                />
                                 {career.name}
                               </div>
                             </SelectItem>
@@ -190,11 +246,19 @@ export default function Team() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsJoinDialogOpen(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsJoinDialogOpen(false)}
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={handleJoinTeam} disabled={joinTeam.isPending}>
-                      {joinTeam.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button
+                      onClick={handleJoinTeam}
+                      disabled={joinTeam.isPending}
+                    >
+                      {joinTeam.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       Join Team
                     </Button>
                   </DialogFooter>
@@ -213,28 +277,40 @@ export default function Team() {
           return (
             <Card
               key={career.role}
-              className={`hover:border-primary transition-colors ${isCurrentRole ? `border-2 ${career.borderColor}` : ''}`}
+              className={`hover:border-primary transition-colors ${isCurrentRole ? `border-2 ${career.borderColor}` : ""}`}
             >
               <CardHeader>
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`p-3 rounded-lg ${career.color}`}>
-                    <img src={career.icon} alt={career.name} className="h-12 w-12" />
+                    <img
+                      src={career.icon}
+                      alt={career.name}
+                      className="h-12 w-12"
+                    />
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-xl">{career.name}</CardTitle>
                     <Badge variant="outline" className="mt-1">
-                      {members.length} {members.length === 1 ? 'Member' : 'Members'}
+                      {members.length}{" "}
+                      {members.length === 1 ? "Member" : "Members"}
                     </Badge>
                   </div>
                 </div>
-                <CardDescription className="text-sm">{career.description}</CardDescription>
+                <CardDescription className="text-sm">
+                  {career.description}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2">Responsibilities:</h4>
+                  <h4 className="font-semibold text-sm mb-2">
+                    Responsibilities:
+                  </h4>
                   <ul className="space-y-1 text-sm text-muted-foreground">
-                    {career.responsibilities.map((responsibility, index) => (
-                      <li key={index} className="flex items-start gap-2">
+                    {career.responsibilities.map((responsibility) => (
+                      <li
+                        key={responsibility}
+                        className="flex items-start gap-2"
+                      >
                         <span className="text-primary mt-1">•</span>
                         <span>{responsibility}</span>
                       </li>
@@ -246,12 +322,14 @@ export default function Team() {
                   <div>
                     <h4 className="font-semibold text-sm mb-2">Team Roster:</h4>
                     <div className="space-y-2">
-                      {members.map((member, index) => (
+                      {members.map((member) => (
                         <div
-                          key={index}
+                          key={member.name}
                           className="flex items-center gap-2 p-2 rounded-md bg-secondary/50 text-sm"
                         >
-                          <div className={`h-2 w-2 rounded-full ${career.color}`} />
+                          <div
+                            className={`h-2 w-2 rounded-full ${career.color}`}
+                          />
                           <span className="font-medium">{member.name}</span>
                         </div>
                       ))}
@@ -285,18 +363,22 @@ export default function Team() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            Full Throttle features three distinct career roles that allow players to contribute to the team in
-            different ways. Each role has unique responsibilities and plays a crucial part in achieving racing
+            Full Throttle features three distinct career roles that allow
+            players to contribute to the team in different ways. Each role has
+            unique responsibilities and plays a crucial part in achieving racing
             success.
           </p>
           <p>
-            <strong className="text-foreground">One Role Per Player:</strong> You can only select one career role at
-            a time. Choose the role that best matches your skills and interests, or switch roles to experience
-            different aspects of team racing.
+            <strong className="text-foreground">One Role Per Player:</strong>{" "}
+            You can only select one career role at a time. Choose the role that
+            best matches your skills and interests, or switch roles to
+            experience different aspects of team racing.
           </p>
           <p>
-            <strong className="text-foreground">Team Collaboration:</strong> Work together with other team members
-            across all three roles to develop winning strategies, optimize performance, and dominate the competition.
+            <strong className="text-foreground">Team Collaboration:</strong>{" "}
+            Work together with other team members across all three roles to
+            develop winning strategies, optimize performance, and dominate the
+            competition.
           </p>
         </CardContent>
       </Card>

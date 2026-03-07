@@ -1,15 +1,25 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { useGetMyFriends, useAddFriend, useRemoveFriend } from '../hooks/useQueries';
-import { Users, UserPlus, UserMinus, Loader2 } from 'lucide-react';
-import { Principal } from '@dfinity/principal';
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Principal } from "@dfinity/principal";
+import { Loader2, UserMinus, UserPlus, Users } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  useAddFriend,
+  useGetMyFriends,
+  useRemoveFriend,
+} from "../hooks/useQueries";
 
 export default function FriendsManager() {
-  const [friendInput, setFriendInput] = useState('');
+  const [friendInput, setFriendInput] = useState("");
   const { data: friends, isLoading } = useGetMyFriends();
   const addFriend = useAddFriend();
   const removeFriend = useRemoveFriend();
@@ -18,9 +28,9 @@ export default function FriendsManager() {
     try {
       const principal = Principal.fromText(friendInput.trim());
       addFriend.mutate(principal);
-      setFriendInput('');
-    } catch (error) {
-      toast.error('Invalid principal ID format');
+      setFriendInput("");
+    } catch (_error) {
+      toast.error("Invalid principal ID format");
     }
   };
 
@@ -35,7 +45,9 @@ export default function FriendsManager() {
           <Users className="h-5 w-5" />
           Friends Management
         </CardTitle>
-        <CardDescription>Add friends to compete on the friends leaderboard</CardDescription>
+        <CardDescription>
+          Add friends to compete on the friends leaderboard
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add Friend */}
@@ -78,7 +90,8 @@ export default function FriendsManager() {
                   className="flex items-center justify-between p-3 rounded-lg border border-border bg-card"
                 >
                   <span className="font-mono text-sm truncate flex-1">
-                    {friend.toString().slice(0, 12)}...{friend.toString().slice(-8)}
+                    {friend.toString().slice(0, 12)}...
+                    {friend.toString().slice(-8)}
                   </span>
                   <Button
                     variant="ghost"

@@ -1,18 +1,37 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { UserProfile, RaceStats, LeaderboardEntry, PlayerStats, Season, F1RacingTrack, Position, CarState, GroupView, GroupType, ShoppingItem, TeamRoster, TeamRole, AIInput, AIRaceResult, DirectMessage, StoreStatus, XPCoinType } from '../backend';
-import { Plan } from '../backend';
-import { Principal } from '@dfinity/principal';
-import { toast } from 'sonner';
+import type { Principal } from "@dfinity/principal";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type {
+  AIInput,
+  AIRaceResult,
+  CarState,
+  DirectMessage,
+  F1RacingTrack,
+  GroupType,
+  GroupView,
+  LeaderboardEntry,
+  PlayerStats,
+  Position,
+  RaceStats,
+  Season,
+  ShoppingItem,
+  StoreStatus,
+  TeamRole,
+  TeamRoster,
+  UserProfile,
+  XPCoinType,
+} from "../backend";
+import { Plan } from "../backend";
+import { useActor } from "./useActor";
 
 // User Profile Queries
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
 
   const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
+    queryKey: ["currentUserProfile"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getCallerUserProfile();
     },
     enabled: !!actor && !actorFetching,
@@ -32,12 +51,12 @@ export function useSaveCallerUserProfile() {
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-      toast.success('Profile saved successfully');
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
+      toast.success("Profile saved successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to save profile: ${error.message}`);
@@ -50,7 +69,7 @@ export function useGetMyRaceStats() {
   const { actor, isFetching } = useActor();
 
   return useQuery<RaceStats | null>({
-    queryKey: ['myRaceStats'],
+    queryKey: ["myRaceStats"],
     queryFn: async () => {
       if (!actor) return null;
       return actor.getMyRaceStats();
@@ -64,13 +83,17 @@ export function useUpdateRaceStats() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ wins, losses, bestTime }: { wins: bigint; losses: bigint; bestTime: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      wins,
+      losses,
+      bestTime,
+    }: { wins: bigint; losses: bigint; bestTime: bigint }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.updateRaceStats(wins, losses, bestTime);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myRaceStats'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["myRaceStats"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
   });
 }
@@ -80,7 +103,7 @@ export function useGetGlobalLeaderboard(season: Season) {
   const { actor, isFetching } = useActor();
 
   return useQuery<LeaderboardEntry[] | null>({
-    queryKey: ['globalLeaderboard', season],
+    queryKey: ["globalLeaderboard", season],
     queryFn: async () => {
       if (!actor) return null;
       return actor.getGlobalLeaderboard(season);
@@ -93,7 +116,7 @@ export function useGetFriendsLeaderboard(season: Season) {
   const { actor, isFetching } = useActor();
 
   return useQuery<LeaderboardEntry[]>({
-    queryKey: ['friendsLeaderboard', season],
+    queryKey: ["friendsLeaderboard", season],
     queryFn: async () => {
       if (!actor) return [];
       return actor.getFriendsLeaderboard(season);
@@ -107,7 +130,7 @@ export function useGetMyFriends() {
   const { actor, isFetching } = useActor();
 
   return useQuery<Principal[]>({
-    queryKey: ['myFriends'],
+    queryKey: ["myFriends"],
     queryFn: async () => {
       if (!actor) return [];
       return actor.getMyFriends();
@@ -122,13 +145,13 @@ export function useAddFriend() {
 
   return useMutation({
     mutationFn: async (friendPrincipal: Principal) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.addFriend(friendPrincipal);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myFriends'] });
-      queryClient.invalidateQueries({ queryKey: ['friendsLeaderboard'] });
-      toast.success('Friend added successfully');
+      queryClient.invalidateQueries({ queryKey: ["myFriends"] });
+      queryClient.invalidateQueries({ queryKey: ["friendsLeaderboard"] });
+      toast.success("Friend added successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to add friend: ${error.message}`);
@@ -142,13 +165,13 @@ export function useRemoveFriend() {
 
   return useMutation({
     mutationFn: async (friendPrincipal: Principal) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.removeFriend(friendPrincipal);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myFriends'] });
-      queryClient.invalidateQueries({ queryKey: ['friendsLeaderboard'] });
-      toast.success('Friend removed successfully');
+      queryClient.invalidateQueries({ queryKey: ["myFriends"] });
+      queryClient.invalidateQueries({ queryKey: ["friendsLeaderboard"] });
+      toast.success("Friend removed successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to remove friend: ${error.message}`);
@@ -161,7 +184,7 @@ export function useGetMyPlayerStats() {
   const { actor, isFetching } = useActor();
 
   return useQuery<PlayerStats | null>({
-    queryKey: ['myPlayerStats'],
+    queryKey: ["myPlayerStats"],
     queryFn: async () => {
       if (!actor) return null;
       return actor.getMyPlayerStats();
@@ -175,7 +198,7 @@ export function useGetF1RacingTrack() {
   const { actor, isFetching } = useActor();
 
   return useQuery<F1RacingTrack | null>({
-    queryKey: ['f1RacingTrack'],
+    queryKey: ["f1RacingTrack"],
     queryFn: async () => {
       if (!actor) return null;
       return actor.getF1RacingTrack();
@@ -190,7 +213,7 @@ export function useStartRace() {
 
   return useMutation({
     mutationFn: async (trackId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.startRace(trackId);
     },
     onError: (error: Error) => {
@@ -204,7 +227,7 @@ export function useJoinRace() {
 
   return useMutation({
     mutationFn: async (trackId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.joinRace(trackId);
     },
     onError: (error: Error) => {
@@ -219,12 +242,12 @@ export function useFinishRace() {
 
   return useMutation({
     mutationFn: async (trackId: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.finishRace(trackId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myRaceStats'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["myRaceStats"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
     onError: (error: Error) => {
       toast.error(`Failed to finish race: ${error.message}`);
@@ -236,8 +259,18 @@ export function useUpdateCarState() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async ({ position, velocity, direction, laps }: { position: Position; velocity: number; direction: number; laps: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      position,
+      velocity,
+      direction,
+      laps,
+    }: {
+      position: Position;
+      velocity: number;
+      direction: number;
+      laps: bigint;
+    }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.updateCarState(position, velocity, direction, laps);
     },
   });
@@ -248,7 +281,7 @@ export function useGetGroups() {
   const { actor, isFetching } = useActor();
 
   return useQuery<GroupView[]>({
-    queryKey: ['groups'],
+    queryKey: ["groups"],
     queryFn: async () => {
       if (!actor) return [];
       return actor.getGroups();
@@ -262,13 +295,23 @@ export function useCreateGroup() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ name, groupType, maxCapacity, trackId }: { name: string; groupType: GroupType; maxCapacity: bigint; trackId: string | null }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      name,
+      groupType,
+      maxCapacity,
+      trackId,
+    }: {
+      name: string;
+      groupType: GroupType;
+      maxCapacity: bigint;
+      trackId: string | null;
+    }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.createGroup(name, groupType, maxCapacity, trackId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      toast.success('Group created successfully');
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success("Group created successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to create group: ${error.message}`);
@@ -282,12 +325,12 @@ export function useJoinGroup() {
 
   return useMutation({
     mutationFn: async (name: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.joinGroup(name);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      toast.success('Joined group successfully');
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success("Joined group successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to join group: ${error.message}`);
@@ -301,12 +344,12 @@ export function useLeaveGroup() {
 
   return useMutation({
     mutationFn: async (name: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.leaveGroup(name);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      toast.success('Left group successfully');
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      toast.success("Left group successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to leave group: ${error.message}`);
@@ -319,7 +362,7 @@ export function useGetCurrentPlan() {
   const { actor, isFetching } = useActor();
 
   return useQuery<Plan>({
-    queryKey: ['currentPlan'],
+    queryKey: ["currentPlan"],
     queryFn: async () => {
       if (!actor) return Plan.free;
       return actor.getCurrentPlan();
@@ -332,15 +375,21 @@ export function useCreateCheckoutSession() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async (items: ShoppingItem[]): Promise<{ id: string; url: string }> => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async (
+      items: ShoppingItem[],
+    ): Promise<{ id: string; url: string }> => {
+      if (!actor) throw new Error("Actor not available");
       const baseUrl = `${window.location.protocol}//${window.location.host}`;
       const successUrl = `${baseUrl}/payment-success`;
       const cancelUrl = `${baseUrl}/payment-failure`;
-      const result = await actor.createCheckoutSession(items, successUrl, cancelUrl);
+      const result = await actor.createCheckoutSession(
+        items,
+        successUrl,
+        cancelUrl,
+      );
       const session = JSON.parse(result) as { id: string; url: string };
       if (!session?.url) {
-        throw new Error('Stripe session missing url');
+        throw new Error("Stripe session missing url");
       }
       return session;
     },
@@ -355,9 +404,9 @@ export function useGetTeamRoster() {
   const { actor, isFetching } = useActor();
 
   return useQuery<TeamRoster>({
-    queryKey: ['teamRoster'],
+    queryKey: ["teamRoster"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getTeamRoster();
     },
     enabled: !!actor && !isFetching,
@@ -370,12 +419,12 @@ export function useJoinTeam() {
 
   return useMutation({
     mutationFn: async ({ name, role }: { name: string; role: TeamRole }) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.joinTeam(name, role);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamRoster'] });
-      toast.success('Joined team successfully');
+      queryClient.invalidateQueries({ queryKey: ["teamRoster"] });
+      toast.success("Joined team successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to join team: ${error.message}`);
@@ -389,12 +438,12 @@ export function useChangeRole() {
 
   return useMutation({
     mutationFn: async (role: TeamRole) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.changeRole(role);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamRoster'] });
-      toast.success('Role changed successfully');
+      queryClient.invalidateQueries({ queryKey: ["teamRoster"] });
+      toast.success("Role changed successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to change role: ${error.message}`);
@@ -408,12 +457,12 @@ export function useLeaveTeam() {
 
   return useMutation({
     mutationFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.leaveTeam();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamRoster'] });
-      toast.success('Left team successfully');
+      queryClient.invalidateQueries({ queryKey: ["teamRoster"] });
+      toast.success("Left team successfully");
     },
     onError: (error: Error) => {
       toast.error(`Failed to leave team: ${error.message}`);
@@ -426,7 +475,7 @@ export function useGetAIDrivenRaceResults() {
   const { actor, isFetching } = useActor();
 
   return useQuery<AIRaceResult | null>({
-    queryKey: ['aiRaceResults'],
+    queryKey: ["aiRaceResults"],
     queryFn: async () => {
       if (!actor) return null;
       return actor.getAIDrivenRaceResults();
@@ -439,8 +488,11 @@ export function useStartAIRace() {
   const { actor } = useActor();
 
   return useMutation({
-    mutationFn: async ({ trackId, input }: { trackId: string; input: AIInput }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      trackId,
+      input,
+    }: { trackId: string; input: AIInput }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.startAIRace(trackId, input);
     },
     onError: (error: Error) => {
@@ -454,13 +506,16 @@ export function useCompleteAIRace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ trackId, input }: { trackId: string; input: AIInput }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      trackId,
+      input,
+    }: { trackId: string; input: AIInput }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.completeAIRace(trackId, input);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['aiRaceResults'] });
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["aiRaceResults"] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
     onError: (error: Error) => {
       toast.error(`Failed to complete AI race: ${error.message}`);
@@ -474,11 +529,11 @@ export function useProgressSRByAI() {
 
   return useMutation({
     mutationFn: async (srIncrement: bigint) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.progressSRByAI(srIncrement);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUserProfile"] });
     },
     onError: (error: Error) => {
       toast.error(`Failed to progress SR: ${error.message}`);
@@ -491,7 +546,7 @@ export function useGetConversationWithPeer(peer: Principal | null) {
   const { actor, isFetching } = useActor();
 
   return useQuery<DirectMessage[]>({
-    queryKey: ['conversation', peer?.toString()],
+    queryKey: ["conversation", peer?.toString()],
     queryFn: async () => {
       if (!actor || !peer) return [];
       return actor.getConversationWithPeer(peer);
@@ -506,12 +561,17 @@ export function useSendDirectMessage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ recipient, content }: { recipient: Principal; content: string }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      recipient,
+      content,
+    }: { recipient: Principal; content: string }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.sendDirectMessage(recipient, content);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['conversation', variables.recipient.toString()] });
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", variables.recipient.toString()],
+      });
     },
     onError: (error: Error) => {
       toast.error(`Failed to send message: ${error.message}`);
@@ -524,9 +584,9 @@ export function useGetStoreStatus() {
   const { actor, isFetching } = useActor();
 
   return useQuery<StoreStatus>({
-    queryKey: ['storeStatus'],
+    queryKey: ["storeStatus"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getStoreStatus();
     },
     enabled: !!actor && !isFetching,
@@ -539,12 +599,12 @@ export function usePurchaseItem() {
 
   return useMutation({
     mutationFn: async (itemName: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.purchaseItem(itemName);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['storeStatus'] });
-      toast.success('Item purchased successfully!');
+      queryClient.invalidateQueries({ queryKey: ["storeStatus"] });
+      toast.success("Item purchased successfully!");
     },
     onError: (error: Error) => {
       toast.error(`Purchase failed: ${error.message}`);
@@ -557,15 +617,18 @@ export function useCollectXPCoin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ coinType, trackId }: { coinType: XPCoinType; trackId: string }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      coinType,
+      trackId,
+    }: { coinType: XPCoinType; trackId: string }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.collectXPCoin(coinType, trackId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['storeStatus'] });
+      queryClient.invalidateQueries({ queryKey: ["storeStatus"] });
     },
     onError: (error: Error) => {
-      console.error('Failed to collect XP coin:', error.message);
+      console.error("Failed to collect XP coin:", error.message);
     },
   });
 }
