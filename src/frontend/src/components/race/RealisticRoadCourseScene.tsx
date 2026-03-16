@@ -607,51 +607,386 @@ function Trees() {
   );
 }
 
-// ─── Pit Building ─────────────────────────────────────────────────────────────
-function PitBuilding() {
+// ─── Pit Lane Complex (Indianapolis-style) ────────────────────────────────────
+// Main straight runs along z=-10 from x=-220 to x=-120 (left to right).
+// Pit side is toward negative-z (south side).
+function PitLaneComplex() {
+  // 8 garages evenly spaced from x=-210 to x=-130
+  const garageXPositions = Array.from(
+    { length: 8 },
+    (_, i) => -210 + i * (80 / 7),
+  );
+
+  // Crew figure positions per garage (3 per box)
+  const crewOffsets: [number, number][] = [
+    [-2.5, 0],
+    [0, 0.5],
+    [2.5, 0],
+  ];
+
   return (
-    <group position={[-175, 0, -28]}>
-      {/* Main building */}
-      <mesh castShadow receiveShadow position={[0, 3, 0]}>
-        <boxGeometry args={[20, 6, 8]} />
-        <meshStandardMaterial color="#c8c8c8" roughness={0.8} metalness={0.1} />
+    <group>
+      {/* ── 1. Pit Wall (concrete barrier between track and pit lane) ────── */}
+      {/* Left segment: x=-215 to x=-164 */}
+      <mesh castShadow receiveShadow position={[-189.5, 0.45, -17]}>
+        <boxGeometry args={[51, 0.9, 0.5]} />
+        <meshStandardMaterial color="#d0cfc8" roughness={0.85} />
       </mesh>
-      {/* Roof */}
-      <mesh castShadow position={[0, 6.5, 0]}>
-        <boxGeometry args={[21, 0.4, 9]} />
-        <meshStandardMaterial color="#888888" roughness={0.7} />
+      {/* Top cap left */}
+      <mesh position={[-189.5, 0.92, -17]}>
+        <boxGeometry args={[51, 0.08, 0.55]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.6} />
       </mesh>
-      {/* Garage doors */}
-      {[-6, -2, 2, 6].map((x) => (
-        <mesh key={`door-${x}`} position={[x, 1.5, 4.1]}>
-          <boxGeometry args={[3, 3, 0.1]} />
-          <meshStandardMaterial color="#444444" roughness={0.6} />
-        </mesh>
-      ))}
-      {/* Pit lane awning */}
-      <mesh castShadow position={[0, 5, 6]}>
-        <boxGeometry args={[22, 0.3, 4]} />
-        <meshStandardMaterial color="#cc2222" roughness={0.7} />
+      {/* Right segment: x=-152 to x=-125 */}
+      <mesh castShadow receiveShadow position={[-138.5, 0.45, -17]}>
+        <boxGeometry args={[27, 0.9, 0.5]} />
+        <meshStandardMaterial color="#d0cfc8" roughness={0.85} />
       </mesh>
-      {/* Support columns */}
-      {[-9, -3, 3, 9].map((x) => (
-        <mesh key={`col-${x}`} castShadow position={[x, 2.5, 8]}>
-          <cylinderGeometry args={[0.2, 0.2, 5, 8]} />
-          <meshStandardMaterial
-            color="#999999"
-            roughness={0.6}
-            metalness={0.3}
-          />
-        </mesh>
-      ))}
-      {/* Pit lane surface */}
+      {/* Top cap right */}
+      <mesh position={[-138.5, 0.92, -17]}>
+        <boxGeometry args={[27, 0.08, 0.55]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.6} />
+      </mesh>
+
+      {/* ── 2. Pit Lane Surface ───────────────────────────────────────────── */}
       <mesh
         receiveShadow
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, 0.02, 10]}
+        position={[-170, 0.02, -23]}
       >
-        <planeGeometry args={[22, 12]} />
-        <meshStandardMaterial color="#3a3a3a" roughness={0.85} />
+        <planeGeometry args={[90, 10]} />
+        <meshStandardMaterial color="#2e2e2e" roughness={0.88} />
+      </mesh>
+      {/* White center lane marking */}
+      <mesh
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[-170, 0.03, -23]}
+      >
+        <planeGeometry args={[90, 0.2]} />
+        <meshStandardMaterial
+          color="#ffffff"
+          roughness={0.7}
+          opacity={0.9}
+          transparent
+        />
+      </mesh>
+
+      {/* ── 3. Pit Box Garages ────────────────────────────────────────────── */}
+      {garageXPositions.map((gx, i) => (
+        <group key={`garage-${Math.round(gx)}`} position={[gx, 0, -33]}>
+          {/* Main garage body */}
+          <mesh castShadow receiveShadow position={[0, 2, 0]}>
+            <boxGeometry args={[9.5, 4, 6]} />
+            <meshStandardMaterial
+              color="#1a1a2e"
+              roughness={0.75}
+              metalness={0.1}
+            />
+          </mesh>
+          {/* Garage door panel */}
+          <mesh position={[0, 1.8, 3.05]}>
+            <boxGeometry args={[7.5, 3.2, 0.1]} />
+            <meshStandardMaterial color="#3a3a4a" roughness={0.6} />
+          </mesh>
+          {/* Door horizontal slats */}
+          {[0, 0.6, 1.2, 1.8, 2.4, 3.0].map((sy, _si) => (
+            <mesh key={`slat-${sy}`} position={[0, sy + 0.3, 3.08]}>
+              <boxGeometry args={[7.5, 0.08, 0.05]} />
+              <meshStandardMaterial color="#555566" roughness={0.5} />
+            </mesh>
+          ))}
+          {/* Team awning (alternating red / navy) */}
+          <mesh castShadow position={[0, 4.15, 5.5]}>
+            <boxGeometry args={[9.8, 0.25, 5]} />
+            <meshStandardMaterial
+              color={i % 2 === 0 ? "#cc2222" : "#002244"}
+              roughness={0.7}
+            />
+          </mesh>
+          {/* Awning support columns (front) */}
+          {[-4, 4].map((cx, _ci) => (
+            <mesh key={`acol-${cx}`} castShadow position={[cx, 2, 8]}>
+              <cylinderGeometry args={[0.15, 0.15, 4, 8]} />
+              <meshStandardMaterial
+                color="#888899"
+                roughness={0.5}
+                metalness={0.4}
+              />
+            </mesh>
+          ))}
+          {/* Sponsor color strip on front */}
+          <mesh position={[0, 3.6, 3.06]}>
+            <boxGeometry args={[7.5, 0.6, 0.08]} />
+            <meshStandardMaterial
+              color={
+                i % 3 === 0 ? "#cc2222" : i % 3 === 1 ? "#002244" : "#22aa44"
+              }
+              roughness={0.6}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      {/* ── 4. Pit Crew Figures ───────────────────────────────────────────── */}
+      {garageXPositions.map((gx, _i) =>
+        crewOffsets.map(([cx, cz], _j) => (
+          <group
+            key={`crew-${Math.round(gx)}-${cx}-${cz}`}
+            position={[gx + cx, 0, -26 + cz]}
+          >
+            {/* Body */}
+            <mesh castShadow position={[0, 0.9, 0]}>
+              <cylinderGeometry args={[0.22, 0.22, 1.1, 8]} />
+              <meshStandardMaterial color="#ff6600" roughness={0.8} />
+            </mesh>
+            {/* Head */}
+            <mesh castShadow position={[0, 1.65, 0]}>
+              <sphereGeometry args={[0.2, 8, 8]} />
+              <meshStandardMaterial color="#ffcc99" roughness={0.7} />
+            </mesh>
+            {/* Helmet */}
+            <mesh castShadow position={[0, 1.72, 0]}>
+              <sphereGeometry args={[0.22, 8, 8]} />
+              <meshStandardMaterial
+                color="#cc2222"
+                roughness={0.5}
+                metalness={0.3}
+              />
+            </mesh>
+          </group>
+        )),
+      )}
+
+      {/* ── 5. Pagoda / Control Tower ─────────────────────────────────────── */}
+      <group position={[-155, 0, -45]}>
+        {/* Base tier */}
+        <mesh castShadow receiveShadow position={[0, 2, 0]}>
+          <boxGeometry args={[10, 4, 10]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.8} />
+        </mesh>
+        {/* Base windows */}
+        {[-3, 0, 3].map((wx) => (
+          <mesh key={`bw-${wx}`} position={[wx, 2.5, 5.06]}>
+            <boxGeometry args={[1.8, 1.4, 0.1]} />
+            <meshStandardMaterial
+              color="#223366"
+              roughness={0.3}
+              metalness={0.5}
+            />
+          </mesh>
+        ))}
+        {/* Mid tier */}
+        <mesh castShadow position={[0, 5.5, 0]}>
+          <boxGeometry args={[8, 3, 8]} />
+          <meshStandardMaterial color="#dddddd" roughness={0.75} />
+        </mesh>
+        {/* Mid windows */}
+        {[-2, 2].map((wx) => (
+          <mesh key={`mw-${wx}`} position={[wx, 5.8, 4.06]}>
+            <boxGeometry args={[2, 1.2, 0.1]} />
+            <meshStandardMaterial
+              color="#223366"
+              roughness={0.3}
+              metalness={0.5}
+            />
+          </mesh>
+        ))}
+        {/* Top tier */}
+        <mesh castShadow position={[0, 8.5, 0]}>
+          <boxGeometry args={[6, 3, 6]} />
+          <meshStandardMaterial color="#cccccc" roughness={0.7} />
+        </mesh>
+        {/* Top windows – panoramic */}
+        {[-1.5, 1.5].map((wx) => (
+          <mesh key={`tw-${wx}`} position={[wx, 8.7, 3.06]}>
+            <boxGeometry args={[2.4, 1.5, 0.1]} />
+            <meshStandardMaterial
+              color="#aaccff"
+              roughness={0.2}
+              metalness={0.6}
+              transparent
+              opacity={0.85}
+            />
+          </mesh>
+        ))}
+        {/* Observation deck ring */}
+        <mesh castShadow position={[0, 10.25, 0]}>
+          <boxGeometry args={[12, 0.5, 12]} />
+          <meshStandardMaterial
+            color="#999999"
+            roughness={0.6}
+            metalness={0.2}
+          />
+        </mesh>
+        {/* Observation deck railing */}
+        {[-5.5, 5.5].map((rx, _ri) => (
+          <mesh key={`rail-${rx}`} position={[rx, 10.9, 0]}>
+            <boxGeometry args={[0.15, 0.9, 12]} />
+            <meshStandardMaterial
+              color="#888888"
+              roughness={0.5}
+              metalness={0.4}
+            />
+          </mesh>
+        ))}
+        {/* Flag poles */}
+        {[-2, 0, 2].map((fx, fi) => (
+          <group key={`flag-${fx}`} position={[fx, 10.5, 0]}>
+            <mesh castShadow position={[0, 1.5, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 3, 6]} />
+              <meshStandardMaterial
+                color="#aaaaaa"
+                roughness={0.4}
+                metalness={0.6}
+              />
+            </mesh>
+            <mesh position={[0.5, 2.6, 0]}>
+              <boxGeometry args={[0.8, 0.5, 0.05]} />
+              <meshStandardMaterial
+                color={fi === 0 ? "#cc2222" : fi === 1 ? "#002244" : "#22aa44"}
+                roughness={0.6}
+              />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      {/* ── 6. Pit Lane Armco (outer edge at z=-30) ───────────────────────── */}
+      <mesh castShadow position={[-170, 0.2, -30]}>
+        <boxGeometry args={[90, 0.4, 0.15]} />
+        <meshStandardMaterial
+          color="#888888"
+          roughness={0.5}
+          metalness={0.35}
+        />
+      </mesh>
+      {/* Armco corrugation effect – thin overlaid strips */}
+      {Array.from({ length: 18 }, (_, i) => -215 + i * 5).map((ax) => (
+        <mesh key={`armco-${ax}`} position={[ax, 0.25, -30]}>
+          <boxGeometry args={[0.15, 0.15, 0.2]} />
+          <meshStandardMaterial
+            color="#aaaaaa"
+            roughness={0.4}
+            metalness={0.5}
+          />
+        </mesh>
+      ))}
+
+      {/* ── 7. Large Grandstands behind garages ──────────────────────────── */}
+      {[0, 1, 2, 3].map((si) => {
+        const sx = -210 + si * 22.5;
+        return (
+          <group key={`gs-${sx}`} position={[sx, 0, -52]}>
+            {/* 4 seating tiers */}
+            {[0, 1, 2, 3].map((tier) => (
+              <mesh
+                key={`tier-${tier}`}
+                castShadow
+                receiveShadow
+                position={[0, tier * 2.2 + 1.1, tier * 1.8]}
+              >
+                <boxGeometry args={[20, 2.2, 3]} />
+                <meshStandardMaterial
+                  color={tier % 2 === 0 ? "#cc2222" : "#eeeeee"}
+                  roughness={0.8}
+                />
+              </mesh>
+            ))}
+            {/* Roof canopy */}
+            <mesh castShadow position={[0, 10.5, 6]}>
+              <boxGeometry args={[21, 0.35, 8]} />
+              <meshStandardMaterial
+                color="#888888"
+                roughness={0.65}
+                metalness={0.25}
+              />
+            </mesh>
+            {/* Canopy support columns */}
+            {[-9, -3, 3, 9].map((cx) => (
+              <mesh key={`cs-${cx}`} castShadow position={[cx, 7, 9]}>
+                <cylinderGeometry args={[0.18, 0.18, 6, 8]} />
+                <meshStandardMaterial
+                  color="#999999"
+                  roughness={0.55}
+                  metalness={0.35}
+                />
+              </mesh>
+            ))}
+          </group>
+        );
+      })}
+
+      {/* ── 8. Crowd tiles in grandstands ─────────────────────────────────── */}
+      {[0, 1, 2, 3].map((si) => {
+        const sx = -210 + si * 22.5;
+        return [0, 1, 2, 3].map((tier) => (
+          <group
+            key={`crowd-${sx}-${tier}`}
+            position={[sx, tier * 2.2 + 2.3, -52 + tier * 1.8]}
+          >
+            {[-8, -4, 0, 4, 8].map((cx) => (
+              <mesh
+                key={`c-${cx}`}
+                position={[cx, 0, 0]}
+                rotation={[-Math.PI / 2, 0, 0]}
+              >
+                <planeGeometry args={[3.5, 2.5]} />
+                <meshStandardMaterial
+                  color={
+                    (si + tier + Math.abs(cx)) % 3 === 0
+                      ? "#cc2222"
+                      : (si + tier + Math.abs(cx)) % 3 === 1
+                        ? "#002244"
+                        : "#eeeeee"
+                  }
+                  roughness={0.9}
+                />
+              </mesh>
+            ))}
+          </group>
+        ));
+      })}
+
+      {/* ── 9. Pit Entry / Exit Lines on track ───────────────────────────── */}
+      {/* Pit entry dashed line at x≈-175, z=-10 */}
+      {[0, 1, 2].map((di) => (
+        <mesh
+          key={`pe-${di}`}
+          receiveShadow
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[-175, 0.04, -12 - di * 1.5]}
+        >
+          <planeGeometry args={[0.25, 1]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        </mesh>
+      ))}
+      {/* Pit exit dashed line at x≈-145, z=-10 */}
+      {[0, 1, 2].map((di) => (
+        <mesh
+          key={`px-${di}`}
+          receiveShadow
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[-145, 0.04, -12 - di * 1.5]}
+        >
+          <planeGeometry args={[0.25, 1]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        </mesh>
+      ))}
+
+      {/* ── Pit lane speed-limit line (blended pit entry path) ────────────── */}
+      <mesh
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[-160, 0.03, -14]}
+      >
+        <planeGeometry args={[30, 0.18]} />
+        <meshStandardMaterial
+          color="#ffdd00"
+          roughness={0.7}
+          opacity={0.9}
+          transparent
+        />
       </mesh>
     </group>
   );
@@ -715,14 +1050,10 @@ export function RealisticRoadCourseScene({
       {/* Trees scattered around */}
       <Trees />
 
-      {/* Pit building */}
-      <PitBuilding />
+      {/* Indianapolis-style pit lane complex */}
+      <PitLaneComplex />
 
       {/* Grandstands – positioned alongside the main straight and key corners */}
-      {/* Main straight grandstand */}
-      <Grandstand position={[-170, 0, -32]} rotation={0} />
-      <Grandstand position={[-140, 0, -32]} rotation={0} />
-      <Grandstand position={[-110, 0, -32]} rotation={0} />
       {/* Turn 1 grandstand */}
       <Grandstand position={[-68, 0, -68]} rotation={Math.PI / 4} />
       {/* Kemmel straight far end */}
