@@ -1060,6 +1060,111 @@ export function RealisticRoadCourseScene({
       <Grandstand position={[-155, 0, 175]} rotation={0.1} />
       {/* Pouhon outer bank */}
       <Grandstand position={[145, 0, 120]} rotation={-Math.PI / 2} />
+
+      {/* Jumbotrons — giant screens around the circuit */}
+      <Jumbotron position={[-160, 0, -40]} rotation={Math.PI / 2} />
+      <Jumbotron position={[130, 0, 100]} rotation={-Math.PI / 2} />
+      <Jumbotron position={[-80, 0, 185]} rotation={Math.PI} />
+    </group>
+  );
+}
+
+// ─── Jumbotron ────────────────────────────────────────────────────────────────
+// Large F1-style screen showing live camera feed (simulated)
+export function Jumbotron({
+  position,
+  rotation,
+}: {
+  position: [number, number, number];
+  rotation?: number;
+}) {
+  return (
+    <group position={position} rotation={[0, rotation ?? 0, 0]}>
+      {/* Support legs */}
+      {[-5, 5].map((lx) => (
+        <mesh key={`leg-${lx}`} castShadow position={[lx, 6, 0]}>
+          <cylinderGeometry args={[0.3, 0.4, 12, 8]} />
+          <meshStandardMaterial
+            color="#444444"
+            metalness={0.8}
+            roughness={0.3}
+          />
+        </mesh>
+      ))}
+
+      {/* Horizontal crossbeam */}
+      <mesh castShadow position={[0, 12.5, 0]}>
+        <boxGeometry args={[12, 0.5, 0.5]} />
+        <meshStandardMaterial color="#444444" metalness={0.8} roughness={0.3} />
+      </mesh>
+
+      {/* Screen frame (black border) */}
+      <mesh castShadow position={[0, 16, 0]}>
+        <boxGeometry args={[13, 8.5, 0.4]} />
+        <meshStandardMaterial color="#111111" metalness={0.6} roughness={0.4} />
+      </mesh>
+
+      {/* Screen face – dark display panel */}
+      <mesh position={[0, 16, 0.25]}>
+        <boxGeometry args={[12, 7.5, 0.05]} />
+        <meshStandardMaterial
+          color="#030818"
+          emissive="#0a1530"
+          emissiveIntensity={0.8}
+          metalness={0.1}
+          roughness={0.9}
+        />
+      </mesh>
+
+      {/* LIVE indicator bar (red top stripe) */}
+      <mesh position={[0, 19.6, 0.3]}>
+        <boxGeometry args={[12, 0.6, 0.06]} />
+        <meshStandardMaterial
+          color="#cc0000"
+          emissive="#ff0000"
+          emissiveIntensity={2}
+        />
+      </mesh>
+
+      {/* Screen content – bright center element simulating video feed */}
+      <mesh position={[0, 16, 0.3]}>
+        <boxGeometry args={[10, 5.5, 0.04]} />
+        <meshStandardMaterial
+          color="#0a1f3a"
+          emissive="#0066cc"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+
+      {/* F1 car silhouette on screen */}
+      <mesh position={[0, 15.8, 0.35]}>
+        <boxGeometry args={[5, 1.2, 0.03]} />
+        <meshStandardMaterial
+          color="#00aaff"
+          emissive="#00aaff"
+          emissiveIntensity={1.5}
+        />
+      </mesh>
+
+      {/* Speed bar */}
+      <mesh position={[-2, 13.8, 0.35]}>
+        <boxGeometry args={[3, 0.4, 0.03]} />
+        <meshStandardMaterial
+          color="#00ff88"
+          emissive="#00ff88"
+          emissiveIntensity={2}
+        />
+      </mesh>
+
+      {/* Sponsor strip at bottom */}
+      <mesh position={[0, 12.6, 0.3]}>
+        <boxGeometry args={[12, 0.8, 0.06]} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive="#ffffff"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
     </group>
   );
 }

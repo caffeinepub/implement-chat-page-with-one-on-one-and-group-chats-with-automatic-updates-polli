@@ -13,10 +13,11 @@ import { RealisticSportsCoupeCar } from "./race/RealisticSportsCoupeCar";
 const TOTAL_LAPS = 3;
 const RACE_TIME_LIMIT = 120; // seconds
 const NITRO_DURATION = 10; // seconds
-const PIT_STOP_T = 0.08;
+const PIT_STOP_T = 0.955; // triggers on main straight near pit wall gap (x≈-155)
 const PIT_COOLDOWN = 12; // seconds between pit stop triggers
 const PIT_BOX_POSITION = new THREE.Vector3(-170, 0.1, -26);
 const PIT_LERP_SPEED = 6; // units/sec approach speed multiplier
+const PIT_ENTRY_POSITION = new THREE.Vector3(-158, 0.1, -17); // through the pit wall gap
 
 type PitPhase = "none" | "entering" | "parked" | "exiting";
 
@@ -217,7 +218,8 @@ function PlayerCarPhysics({
   const controls = useForwardBackwardControls();
   const physicsRef = useRef({ t: 0, speed: 0 });
   const pitCooldownRef = useRef(0);
-  const pitTransitionPosRef = useRef(new THREE.Vector3());
+  const _pitTransitionPosRef = useRef(new THREE.Vector3());
+  const pitEntryStageRef = useRef<"toGap" | "toBox">("toGap"); // two-stage pit entry
 
   useFrame((state, delta) => {
     if (racePhase !== "racing") return;
@@ -227,13 +229,15 @@ function PlayerCarPhysics({
     const dt = Math.min(delta, 0.05);
     const pitPhase = pitPhaseRef.current;
 
-    // ── Pit Animation: Entering ──────────────────────────────────────────────
+    // ── Pit Animation: Entering (two-stage: track → pit wall gap → pit box) ──
     if (pitPhase === "entering") {
+      const stage = pitEntryStageRef.current;
+      const target = stage === "toGap" ? PIT_ENTRY_POSITION : PIT_BOX_POSITION;
       const current = carStateRef.current.position.clone();
-      current.lerp(PIT_BOX_POSITION, dt * PIT_LERP_SPEED * 3);
+      const speed = stage === "toGap" ? PIT_LERP_SPEED * 4 : PIT_LERP_SPEED * 3;
+      current.lerp(target, dt * speed);
 
-      // Orient toward pit box
-      const dir = PIT_BOX_POSITION.clone().sub(carStateRef.current.position);
+      const dir = target.clone().sub(carStateRef.current.position);
       const rotation =
         dir.length() > 0.1
           ? Math.atan2(dir.x, dir.z)
@@ -243,13 +247,18 @@ function PlayerCarPhysics({
         ...carStateRef.current,
         position: current,
         rotation,
-        velocity: 60, // slow crawl speed display
+        velocity: 60,
         suspensionOffset: 0,
       };
 
-      if (current.distanceTo(PIT_BOX_POSITION) < 1.2) {
-        pitEntryTRef.current = physics.t;
-        pitTransitionPosRef.current.copy(PIT_BOX_POSITION);
+      if (stage === "toGap" && current.distanceTo(PIT_ENTRY_POSITION) < 1.5) {
+        // Crossed pit wall gap — now head to the pit box
+        pitEntryStageRef.current = "toBox";
+      } else if (
+        stage === "toBox" &&
+        current.distanceTo(PIT_BOX_POSITION) < 1.2
+      ) {
+        pitEntryTRef.current = PIT_STOP_T + 0.005; // rejoin just after pit exit
         carStateRef.current = {
           ...carStateRef.current,
           position: PIT_BOX_POSITION.clone(),
@@ -272,13 +281,31 @@ function PlayerCarPhysics({
       return;
     }
 
-    // ── Pit Animation: Exiting ────────────────────────────────────────────────
+    // ── Pit Animation: Exiting (pit box → pit wall gap → back on track) ──────
     if (pitPhase === "exiting") {
-      const reentryT = pitEntryTRef.current;
-      const point = curve.getPointAt(reentryT);
-      const targetPos = new THREE.Vector3(point.x, 0.15, point.z);
-      const tangent = curve.getTangentAt(reentryT).normalize();
-      const rotation = Math.atan2(tangent.x, tangent.z);
+      // Exit along the pit lane back through the gap, then rejoin the main straight
+      const exitStage = pitEntryStageRef.current; // "toBox" while exiting means go to gap first
+      const targetPos =
+        exitStage === "toBox"
+          ? PIT_ENTRY_POSITION
+          : (() => {
+              const reentryT = pitEntryTRef.current;
+              const pt = curve.getPointAt(Math.min(reentryT, 0.999));
+              return new THREE.Vector3(pt.x, 0.15, pt.z);
+            })();
+
+      const tangent =
+        exitStage !== "toBox"
+          ? curve
+              .getTangentAt(Math.min(pitEntryTRef.current, 0.999))
+              .normalize()
+          : null;
+      const rotation = tangent
+        ? Math.atan2(tangent.x, tangent.z)
+        : Math.atan2(
+            targetPos.x - carStateRef.current.position.x,
+            targetPos.z - carStateRef.current.position.z,
+          );
 
       const current = carStateRef.current.position.clone();
       current.lerp(targetPos, dt * PIT_LERP_SPEED * 2.5);
@@ -292,11 +319,22 @@ function PlayerCarPhysics({
       };
       speedRef.current = 80;
 
-      if (current.distanceTo(targetPos) < 2.5) {
-        // Snap to track and resume
-        pitStopActiveRef.current = false;
-        physics.speed = 0.0008; // give a gentle restart
-        onPitExited();
+      if (
+        exitStage === "toBox" &&
+        current.distanceTo(PIT_ENTRY_POSITION) < 1.5
+      ) {
+        // Crossed gap — now merge onto the main straight
+        pitEntryStageRef.current = "toGap";
+      } else if (exitStage === "toGap") {
+        const reentryT = pitEntryTRef.current;
+        const pt = curve.getPointAt(Math.min(reentryT, 0.999));
+        const onTrack = new THREE.Vector3(pt.x, 0.15, pt.z);
+        if (current.distanceTo(onTrack) < 2.5) {
+          pitStopActiveRef.current = false;
+          physics.t = reentryT;
+          physics.speed = 0.0008;
+          onPitExited();
+        }
       }
       return;
     }
@@ -340,6 +378,7 @@ function PlayerCarPhysics({
       physics.t >= PIT_STOP_T
     ) {
       pitCooldownRef.current = PIT_COOLDOWN;
+      pitEntryStageRef.current = "toGap"; // reset two-stage path
       onPitStop();
     }
 

@@ -17,7 +17,9 @@ import { useGetCallerUserProfile } from "./hooks/useQueries";
 import MainMenu from "./pages/MainMenu";
 import PaymentFailure from "./pages/PaymentFailure";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import SpectatorMode from "./pages/SpectatorMode";
 import Store from "./pages/Store";
+import TrackBuilder from "./pages/TrackBuilder";
 
 function RootComponent() {
   const { identity, loginStatus } = useInternetIdentity();
@@ -102,12 +104,26 @@ const singlePlayerRaceRoute = createRoute({
   component: SinglePlayerRace,
 });
 
+const trackBuilderRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/track-builder",
+  component: TrackBuilder,
+});
+
+const spectatorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/spectator",
+  component: SpectatorMode,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   storeRoute,
   paymentSuccessRoute,
   paymentFailureRoute,
   singlePlayerRaceRoute,
+  trackBuilderRoute,
+  spectatorRoute,
 ]);
 
 const router = createRouter({ routeTree });

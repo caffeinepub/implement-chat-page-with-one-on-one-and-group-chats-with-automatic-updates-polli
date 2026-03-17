@@ -10,7 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Briefcase,
+  Construction,
   CreditCard,
+  Eye,
   Flag,
   Gamepad2,
   ShoppingBag,
@@ -242,7 +244,71 @@ export default function MainMenu() {
             </Card>
           </div>
 
-          {/* Row 3: Premium Plans */}
+          {/* Row 3: Track Builder + Spectator */}
+          <div className="grid gap-6 md:grid-cols-2 mt-6">
+            <Card
+              className="hover:border-primary transition-colors cursor-pointer border-green-500/40 bg-gradient-to-br from-green-900/20 to-emerald-900/20"
+              onClick={() => navigate({ to: "/track-builder" })}
+              data-ocid="menu.track_builder.card"
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Construction className="h-6 w-6 text-green-400" />
+                  Build a Track
+                </CardTitle>
+                <CardDescription>
+                  Design your own custom F1 circuit
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Use the track editor to draw circuits, place pit stops, boost
+                  pads, and decorations. Save and race on your creation.
+                </p>
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  size="lg"
+                  data-ocid="menu.track_builder.primary_button"
+                >
+                  <Construction className="mr-2 h-4 w-4" />
+                  Open Track Builder
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="hover:border-primary transition-colors cursor-pointer border-sky-500/40 bg-gradient-to-br from-sky-900/20 to-blue-900/20"
+              onClick={() => navigate({ to: "/spectator" })}
+              data-ocid="menu.spectator.card"
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="h-6 w-6 text-sky-400" />
+                  Watch Race
+                </CardTitle>
+                <CardDescription>
+                  Spectate live races from any angle
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Join as a spectator and watch the race unfold. Free-roam
+                  camera or follow any car with Tab. Jumbotrons show live
+                  close-up action.
+                </p>
+                <Button
+                  className="w-full bg-sky-600 hover:bg-sky-700 text-white"
+                  size="lg"
+                  data-ocid="menu.spectator.primary_button"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Spectate Race
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Row 4: Premium Plans */}
           <div className="grid gap-6 md:grid-cols-1 mt-6">
             <Card
               className="bg-gradient-to-r from-primary/10 to-blue-600/10 border-primary/50 hover:border-primary transition-colors cursor-pointer"
